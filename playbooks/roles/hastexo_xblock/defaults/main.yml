@@ -1,0 +1,5 @@
+---
+hastexo_xblock_version: 2.0.0a
+hastexo_xblock_repo: https://github.com/hastexo/hastexo-xblock.git
+hastexo_xblock_url: /hastexo-xblock
+hastexo_xblock_port: 8080
