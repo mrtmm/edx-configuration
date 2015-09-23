@@ -31,6 +31,7 @@ server_utils_debian_pkgs:
   # TODO: move to Vagrant role
   - tree
   - screen
+  - htop
   - tmux
   - curl
   - vim
