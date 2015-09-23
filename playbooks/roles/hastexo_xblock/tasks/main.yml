@@ -1,0 +1,80 @@
+---
+- name: Install requirements
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - openjdk-8-jdk-headless
+    - tomcat8
+    - maven
+
+- name: Checkout repository
+  git:
+    repo: "{{ hastexo_xblock_repo }}"
+    version: "v{{ hastexo_xblock_version }}"
+    dest: /tmp/hastexo-xblock
+
+- name: Build package
+  command: mvn package
+  args:
+    chdir: /tmp/hastexo-xblock/guacamole
+
+- name: Copy war file
+  copy:
+    remote_src: yes
+    src: /tmp/hastexo-xblock/guacamole/target/hastexo-xblock-{{ hastexo_xblock_version }}.war
+    dest: /var/lib/tomcat8/webapps/hastexo-xblock.war
+
+- name: Restart tomcat8
+  systemd:
+    name: tomcat8
+    enabled: yes
+    state: restarted
+
+- name: Nginx include
+  template:
+    src=hastexo_xblock.j2
+    dest="{{ COMMON_APP_DIR }}/nginx/include/lms/hastexo-xblock"
+    owner=root
+    group="{{ common_web_group }}"
+  notify:
+    - restart nginx
+  when: not devstack
+
+- name: "Supervisor scripts"
+  template:
+    src: "{{ item }}.conf.j2"
+    dest: "{{ supervisor_available_dir }}/{{ item }}.conf"
+    owner: "{{ supervisor_user }}"
+    group: "{{ common_web_user }}"
+    mode: "0644"
+  with_items:
+    - suspender
+    - reaper
+
+- name: "Enable supervisor scripts"
+  file:
+    src: "{{ supervisor_available_dir }}/{{ item }}.conf"
+    dest: "{{ supervisor_cfg_dir }}/{{ item }}.conf"
+    owner: "{{ supervisor_user }}"
+    group: "{{ common_web_user }}"
+    mode: "0644"
+    state: link
+    force: yes
+  with_items:
+    - suspender
+    - reaper
+  when: not disable_edx_services
+
+- name: Update supervisor configuration
+  shell:  "{{ supervisor_ctl }} -c {{ supervisor_cfg }} update"
+  register: supervisor_update
+  changed_when: supervisor_update.stdout is defined and supervisor_update.stdout != ""
+  when: not disable_edx_services
+
+- name: Restart supervisor services
+  shell:  "{{ supervisor_ctl }} -c {{ supervisor_cfg }} restart {{ item }}:"
+  with_items:
+    - suspender
+    - reaper
+  when: not disable_edx_services
