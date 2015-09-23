@@ -1,0 +1,7 @@
+#cloud-config
+merge_how: dict(recurse_array,no_replace)+list(append)
+runcmd:
+  - >
+    CONFIGURATION_REPO="https://github.com/hastexo/edx-configuration.git"
+    CONFIGURATION_VERSION="hastexo/integration/hawthorn/hastexo"
+    bash <(curl -s https://raw.githubusercontent.com/hastexo/edx-configuration/hastexo/integration/hawthorn/hastexo/util/install/ansible-bootstrap.sh)
