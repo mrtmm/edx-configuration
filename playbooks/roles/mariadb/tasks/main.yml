@@ -28,27 +28,15 @@
 - name: Add mariadb apt key
   apt_key:
     url: "{{ COMMON_UBUNTU_APT_KEYSERVER }}{{ MARIADB_APT_KEY_ID }}"
-  when: ansible_distribution_release != 'xenial'
-      
-- name: Add Xenial mariadb apt key
-  apt_key:
-    url: "{{ COMMON_UBUNTU_APT_KEYSERVER }}{{ MARIADB_APT_KEY_XENIAL_ID }}"
-  when: ansible_distribution_release == 'xenial'
- 
+
 - name: add the mariadb repo to the sources list
   apt_repository:
     repo: "{{ MARIADB_REPO }}"
     state: present
 
-- name: install mariadb solo packages
+- name: install mariadb packages
   apt: name={{ item }} update_cache=yes
-  with_items: "{{ mariadb_solo_packages }}"
-  when: not MARIADB_CLUSTERED|bool
-
-- name: install mariadb cluster packages
-  apt: name={{ item }} update_cache=yes
-  with_items: "{{ mariadb_cluster_packages }}"
-  when: MARIADB_CLUSTERED|bool
+  with_items: "{{ mariadb_packages }}"
 
 - name: remove bind-address
   lineinfile:
@@ -62,6 +50,7 @@
 
 - name: start everything
   service: name=mysql state=started
+  when: not MARIADB_CLUSTERED|bool
 
 - name: create databases
   mysql_db:
@@ -70,6 +59,7 @@
     encoding: "{{ item.encoding }}"
   when: item != None and item != '' and MARIADB_CREATE_DBS|bool
   with_items: "{{ MARIADB_DATABASES }}"
+  run_once: true
 
 - name: create database users
   mysql_user:
@@ -80,6 +70,7 @@
     append_privs: yes
   when: item.db != None and item.db != ''
   with_items: "{{ MARIADB_USERS }}"
+  run_once: true
 
 - name: setup the migration db user
   mysql_user:
@@ -90,6 +81,7 @@
     append_privs: yes
   when: item != None and item != ''
   with_items: "{{ MARIADB_DATABASES }}"
+  run_once: true
 
 - name: create api user for the analytics api
   mysql_user:
@@ -98,6 +90,7 @@
     priv: '{{ ANALYTICS_API_DATABASES.default.NAME }}.*:SELECT,INSERT,UPDATE,DELETE/reports.*:SELECT'
     host: "{{ MARIADB_HOST_PRIV }}"
   when: ANALYTICS_API_SERVICE_CONFIG is defined
+  run_once: true
 
 - name: create read-only reports user for the analytics-api
   mysql_user:
@@ -106,6 +99,7 @@
     priv: '{{ ANALYTICS_API_DATABASES.reports.NAME }}.*:SELECT'
     host: "{{ MARIADB_HOST_PRIV }}" 
   when: ANALYTICS_API_SERVICE_CONFIG is defined
+  run_once: true
 
 - name: setup the edx-notes-api db user
   mysql_user:
@@ -114,6 +108,7 @@
     priv: "{{ EDX_NOTES_API_MYSQL_DB_NAME }}.*:SELECT,INSERT,UPDATE,DELETE"
     host: "{{ MARIADB_HOST_PRIV }}"
   when: EDX_NOTES_API_MYSQL_DB_USER is defined
+  run_once: true
 
 - name: setup the read-only db user
   mysql_user:
@@ -121,6 +116,7 @@
     password: "{{ COMMON_MYSQL_READ_ONLY_PASS }}"
     priv: "*.*:SELECT"
     host: "{{ MARIADB_HOST_PRIV }}"
+  run_once: true
 
 - name: setup the admin db user
   mysql_user:
@@ -128,4 +124,18 @@
     password: "{{ COMMON_MYSQL_ADMIN_PASS }}"
     priv: "*.*:CREATE USER"
     host: "{{ MARIADB_HOST_PRIV }}"
+  run_once: true
 
+- command: mysql -NBe "SELECT COUNT(*) FROM mysql.time_zone"
+  register: tzcount
+  changed_when: false
+  run_once: true
+  tags:
+    - tzinfo
+
+- name: import timezone data
+  shell: "mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql mysql"
+  when: tzcount.stdout|int < 1
+  run_once: true
+  tags:
+    - tzinfo
