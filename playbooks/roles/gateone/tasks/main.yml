@@ -59,3 +59,4 @@
     group="{{ common_web_group }}"
   notify:
     - restart nginx
+  when: not devstack
