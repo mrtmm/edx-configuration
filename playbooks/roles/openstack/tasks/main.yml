@@ -34,14 +34,14 @@
     group: root
   when: COMMON_OBJECT_STORE_LOG_SYNC
 
-- name: Create log sync script
+- name: Create log download script
   template:
     src: get-logs-from-swift.j2
     dest: "{{ openstack_log_download_script }}"
     mode: 0755
     owner: root
     group: root
-  when: COMMON_OBJECT_STORE_LOG_SYNC
+  when: COMMON_OBJECT_STORE_LOG_DOWNLOAD
 
 - name: Upload openstack credentials for log script
   template:
@@ -50,7 +50,7 @@
     mode: 0664
     owner: root
     group: root
-  when: COMMON_OBJECT_STORE_LOG_SYNC
+  when: COMMON_OBJECT_STORE_LOG_SYNC or COMMON_OBJECT_STORE_LOG_DOWNLOAD
 
 - name: Create symlink for log sync script
   file:
@@ -58,3 +58,10 @@
     src: "{{ openstack_log_sync_script }}"
     dest: "{{ COMMON_OBJECT_STORE_LOG_SYNC_SCRIPT }}"
   when: COMMON_OBJECT_STORE_LOG_SYNC
+
+- name: Create symlink for log download script
+  file:
+    state: link
+    src: "{{ openstack_log_download_script }}"
+    dest: "{{ COMMON_OBJECT_STORE_LOG_DOWNLOAD_SCRIPT }}"
+  when: COMMON_OBJECT_STORE_LOG_DOWNLOAD
