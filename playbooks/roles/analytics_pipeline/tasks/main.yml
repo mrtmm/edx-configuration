@@ -202,7 +202,7 @@
   tags:
     - install
     - install:base
-  when: COMMON_OBJECT_STORE_LOG_SYNC
+  when: COMMON_OBJECT_STORE_LOG_DOWNLOAD
 
 - name: Cron job syncs log files to hdfs
   cron:
@@ -210,7 +210,7 @@
     name: "Sync tracking logs from Swift"
     special_time: hourly
     job: >
-      {{ openstack_log_download_script }}
+      {{ COMMON_OBJECT_STORE_LOG_DOWNLOAD_SCRIPT }}
       -d {{ HADOOP_COMMON_DATA }}/tmp
       -b {{ COMMON_OBJECT_STORE_LOG_SYNC_BUCKET }}
       -p {{ COMMON_OBJECT_STORE_LOG_SYNC_PREFIX }};
@@ -221,7 +221,7 @@
   tags:
     - install
     - install:configuration
-  when: COMMON_OBJECT_STORE_LOG_SYNC and openstack_log_download_script
+  when: COMMON_OBJECT_STORE_LOG_DOWNLOAD
 
 - name: Test if Hive metadata store schema exists
   shell: ". {{ HADOOP_COMMON_CONF_DIR }}/hadoop-env.sh && {{ HIVE_HOME }}/bin/hive | tr '\n' ' '"
