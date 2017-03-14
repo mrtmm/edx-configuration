@@ -34,15 +34,9 @@
     repo: "{{ MARIADB_REPO }}"
     state: present
 
-- name: install mariadb solo packages
+- name: install mariadb packages
   apt: name={{ item }} update_cache=yes
-  with_items: "{{ mariadb_solo_packages }}"
-  when: not MARIADB_CLUSTERED|bool
-
-- name: install mariadb cluster packages
-  apt: name={{ item }} update_cache=yes
-  with_items: "{{ mariadb_cluster_packages }}"
-  when: MARIADB_CLUSTERED|bool
+  with_items: "{{ mariadb_packages }}"
 
 - name: remove bind-address
   lineinfile:

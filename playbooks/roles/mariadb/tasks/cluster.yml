@@ -15,10 +15,7 @@
   when: not mariadb_bootstrap.stat.exists
 
 - name: setup bootstrap on primary
-  lineinfile:
-    dest: "/etc/mysql/conf.d/galera.cnf"
-    regexp: "^wsrep_cluster_address=gcomm://{{ groups['backend_servers']|join(',') }}$"
-    line: "wsrep_cluster_address=gcomm://"
+  command: "/usr/bin/galera_new_cluster"
   run_once: true
   when: not mariadb_bootstrap.stat.exists
 
@@ -34,21 +31,12 @@
 
 - name: copy fetched file to other cluster members
   copy: src=/tmp/debian.cnf dest=/etc/mysql/debian.cnf
-  when: mariadb_new_debian_cnf is defined  
+  when: mariadb_new_debian_cnf is defined
 
 - name: start everything
   service: name=mysql state=started
   when: not mariadb_bootstrap.stat.exists
   ignore_errors: true
-
-- name: reset galera cluster config since we are bootstrapped
-  template:
-    src: "etc/mysql/conf.d/galera.cnf.j2"
-    dest: "/etc/mysql/conf.d/galera.cnf"
-    owner: "root"
-    group: "root"
-    mode: 0600
-  when: not mariadb_bootstrap.stat.exists
 
 - name: touch bootstrap file to confirm we are fully up
   file: path="/etc/mysql/ansible_cluster_started" state=touch
