@@ -1,7 +1,7 @@
 #cloud-config
 apt_sources:
   - source: "ppa:git-core/ppa"
-  - source: "deb http://ppa.edx.org trusty main"
+  - source: "deb http://ppa.edx.org xenial main"
     keyid: 69464050
 package_update: true
 package_upgrade: true

@@ -7,7 +7,7 @@ parameters:
   image:
     type: string
     description: Image ID or name
-    default: ubuntu-14.04-server-cloudimg
+    default: ubuntu-16.04-server-cloudimg
   flavor:
     type: string
     description: Flavor to use for the server

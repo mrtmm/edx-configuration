@@ -35,11 +35,11 @@ the following steps:
   `neutron net-show <networkname>`).
 - Create a Nova keypair for yourself (`nova keypair-add` or
   `openstack keypair create`).
-- Upload an Ubuntu 14.04 image for your tenant into Glance (`glance
+- Upload an Ubuntu 16.04 image for your tenant into Glance (`glance
   image-create --copy-from
-  https://cloud-images.ubuntu.com/trusty/current/trusty-server-cloudimg-amd64-disk1.img
+  https://cloud-images.ubuntu.com/xenial/current/xenial-server-cloudimg-amd64-disk1.img
   --disk-format qcow2 --container-format bare --name
-  ubuntu-14.04-server-cloudimg`), or have your cloud administrator
+  ubuntu-16.04-server-cloudimg`), or have your cloud administrator
   do the same for you and make the image public.
 
 

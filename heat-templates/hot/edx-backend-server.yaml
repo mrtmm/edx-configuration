@@ -19,7 +19,7 @@ parameters:
     description: >
       Image ID or name.
       Should be a distribution platform supported for Open edX.
-    default: ubuntu-14.04-server-cloudimg
+    default: ubuntu-16.04-server-cloudimg
   flavor:
     type: string
     description: Flavor to use for backend servers
