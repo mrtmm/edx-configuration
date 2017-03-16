@@ -4,7 +4,7 @@
     dest: "/etc/mysql/conf.d/galera.cnf"
     owner: "root"
     group: "root"
-    mode: 0600
+    mode: 0644
 
 - name: check if we have already bootstrapped the cluster
   stat: path=/etc/mysql/ansible_cluster_started
