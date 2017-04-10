@@ -364,40 +364,41 @@ resources:
           https_port: { get_param: app_https_port }
           metadata: { "metering.stack": { get_param: "OS::stack_id" } }
           network: { get_resource: management_net }
+          subnet: { get_resource: management_sub_net }
           security_group: { get_resource: server_security_group }
 
   # app_server_lb: Neutron LBaaS v2 load balancer
   app_server_lb:
     type: OS::Neutron::LBaaS::LoadBalancer
     properties:
-      vip_subnet: { get_resource: management_net }
+      vip_subnet: { get_resource: management_sub_net }
 
   app_server_http_listener:
     type: OS::Neutron::LBaaS::Listener
     properties:
-      loadbalancer: app_server_lb
+      loadbalancer: { get_resource: app_server_lb }
       protocol: TCP
       protocol_port: { get_param: app_http_port }
 
   app_server_https_listener:
     type: OS::Neutron::LBaaS::Listener
     properties:
-      loadbalancer: app_server_lb
+      loadbalancer: { get_resource: app_server_lb }
       protocol: TCP
       protocol_port: { get_param: app_https_port }
 
   app_server_http_pool:
     type: OS::Neutron::LBaaS::Pool
     properties:
-      lb_algorythm: LEAST_CONNECTIONS
-      listener: app_server_http_listener
+      lb_algorithm: LEAST_CONNECTIONS
+      listener: { get_resource: app_server_http_listener }
       protocol: TCP
 
   app_server_https_pool:
     type: OS::Neutron::LBaaS::Pool
     properties:
-      lb_algorythm: LEAST_CONNECTIONS
-      listener: app_server_https_listener
+      lb_algorithm: LEAST_CONNECTIONS
+      listener: { get_resource: app_server_https_listener }
       protocol: TCP
 
   app_server_http_monitor:
@@ -406,7 +407,7 @@ resources:
       type: TCP
       delay: 5
       max_retries: 5
-      pool: app_server_http_pool
+      pool: { get_resource: app_server_http_pool }
       timeout: 5
 
   app_server_https_monitor:
@@ -415,7 +416,7 @@ resources:
       type: TCP
       delay: 5
       max_retries: 5
-      pool: app_server_https_pool
+      pool: { get_resource: app_server_https_pool }
       timeout: 5
 
   # app_server_floating_ip: Neutron LBaaS floating IP address

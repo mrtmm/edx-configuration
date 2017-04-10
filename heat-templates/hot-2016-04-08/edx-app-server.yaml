@@ -52,6 +52,9 @@ parameters:
     type: number
     description: Stack creation timeout (seconds)
     default: 900
+  subnet:
+    type: string
+    description: Subnet on which the load balancer will be located
 
 resources:
   # server_done: Wait condition to signal that the server has completed its
@@ -129,6 +132,7 @@ resources:
       address: { get_attr: [ server, first_address ] }
       pool: { get_param: http_pool }
       protocol_port: { get_param: http_port }
+      subnet: { get_param: subnet }
 
   https_member:
     type: OS::Neutron::LBaaS::PoolMember
@@ -136,6 +140,7 @@ resources:
       address: { get_attr: [ server, first_address ] }
       pool: { get_param: https_pool }
       protocol_port: { get_param: https_port }
+      subnet: { get_param: subnet }
 
 outputs:
   OS::stack_id:
