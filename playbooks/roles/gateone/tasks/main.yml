@@ -29,6 +29,8 @@
   command: "{{ gateone_venv_dir }}/bin/python setup.py install"
   args:
     chdir: "{{ gateone_code_dir }}"
+  notify:
+    - enable gateone
 
 - name: Make SSH connect script executable
   shell: >

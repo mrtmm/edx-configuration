@@ -1,4 +1,7 @@
 ---
+- name: enable gateone
+  service: name=gateone enabled=yes
+
 - name: restart gateone
   service: name=gateone state=restarted
 
