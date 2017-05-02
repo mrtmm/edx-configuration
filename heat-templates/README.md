@@ -16,7 +16,7 @@ environment is approximately one hour. It only takes a few minutes to
 deploy OpenStack, Open edX's Ansible scheme consumes the rest.
 
 The templates support an OpenStack environment running OpenStack
-Icehouse (2014.1) or later.
+Liberty (2015.2) or later.
 
 
 ## Prerequisites
