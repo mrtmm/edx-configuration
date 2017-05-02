@@ -3,7 +3,7 @@
 # instance of the defined flavor, and plugs that instance into an
 # LBaaS pool. The Nova instance is ephemeral and uses no persistent
 # storage.
-heat_template_version: 2016-04-08
+heat_template_version: 2016-10-14
 
 description: >
   Open edX application server
@@ -119,7 +119,13 @@ resources:
       metadata: { get_param: metadata }
       user_data: { get_resource: server_cloud_config }
       user_data_format: RAW
-      networks: [ { network: { get_param: network } } ]
+      networks: [ { port: { get_resource: server_port } } ]
+
+  server_port:
+    type: OS::Neutron::Port
+    properties:
+      dns_name: { get_param: name }
+      network: { get_param: network }
       security_groups: [ { get_param: security_group } ]
 
   # http(s)_member: Neutron LBaaS v2 pool membership

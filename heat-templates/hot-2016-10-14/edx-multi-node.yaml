@@ -2,7 +2,7 @@
 # single deployment node, 3 backend servers backed by persistent
 # volumes, a configurable number of ephemeral application servers, and
 # a load balancing pool behind a floating IP.
-heat_template_version: 2016-04-08
+heat_template_version: 2016-10-14
 
 description: >
   Full Open edX deployment: 3 backend nodes, configurable
@@ -260,7 +260,8 @@ resources:
   deploy_management_port:
     type: OS::Neutron::Port
     properties:
-      network_id: { get_resource: management_net }
+      dns_name: deploy
+      network: { get_resource: management_net }
       security_groups:
         - { get_resource: server_security_group }
       fixed_ips:

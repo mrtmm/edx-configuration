@@ -1,6 +1,6 @@
 # This template defines an Open edX analytics server.
 #
-heat_template_version: 2016-04-08
+heat_template_version: 2016-10-14
 
 description: >
   Open edX analytics server
@@ -135,6 +135,7 @@ resources:
   management_port:
     type: OS::Neutron::Port
     properties:
+      dns_name: { get_param: name }
       network_id: { get_param: network }
       security_groups:
         - { get_param: security_group }
