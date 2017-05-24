@@ -28,5 +28,4 @@
     - role: notifier
       NOTIFIER_DIGEST_TASK_INTERVAL: "5"
     - local_dev
-    - oauth_client_setup
     - gateone

@@ -54,7 +54,6 @@
     - certs
     - postfix
     - gateone
-    - oauth_client_setup
 
 - name: Stop all services on app master
   hosts: app_master
