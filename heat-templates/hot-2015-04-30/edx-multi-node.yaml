@@ -41,6 +41,10 @@ parameters:
     constraints:
       - allowed_values: [ 0, 1 ]
     default: 0
+  app_master_flavor:
+    type: string
+    description: Flavor to use for the master app server
+    default: m1.large
   app_flavor:
     type: string
     description: Flavor to use for app servers
@@ -328,7 +332,7 @@ resources:
         type: edx-app-master.yaml
         properties:
           name: app-master
-          flavor: { get_param: app_flavor }
+          flavor: { get_param: app_master_flavor }
           image: { get_param: app_master_image }
           key_name: { get_param: key_name }
           network: { get_resource: management_net }
