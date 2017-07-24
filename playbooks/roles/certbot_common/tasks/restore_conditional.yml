@@ -1,0 +1,19 @@
+---
+- name: clear existing dir
+  file:
+    state: absent
+    path: "{{ certbot_conf_dir }}/"
+
+- name: restore letsencrypt dir
+  shell: >
+    tar xzf {{ certbot_backup_file }} -C /
+
+- name: restore cert
+  copy:
+    src: "{{ certbot_backup_cert }}"
+    dest: "{{ certbot_cert_path }}"
+
+- name: restore key
+  copy:
+    src: "{{ certbot_backup_key }}"
+    dest: "{{ certbot_key_path }}"

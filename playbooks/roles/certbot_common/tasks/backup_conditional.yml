@@ -1,0 +1,24 @@
+---
+- name: archive letsencrypt dir
+  shell: >
+    tar czf {{ certbot_backup_file }} {{ certbot_conf_dir }}
+
+- name: copy cert
+  copy:
+    src: "{{ certbot_cert_path }}"
+    dest: "{{ certbot_backup_cert }}"
+
+- name: copy key
+  copy:
+    src: "{{ certbot_key_path }}"
+    dest: "{{ certbot_backup_key }}"
+
+- name: commit changes
+  become: no
+  shell: >
+    cd {{ certbot_backup_dir }};
+    git add letsencrypt.tar.gz;
+    git add {{ certbot_cert_name }}.pem;
+    git add {{ certbot_cert_name }}.key;
+    git commit --quiet --author="Letsencrypt <letsencrypt@hastexo.com>" --message="Auto letsencrypt backup";
+    exit 0

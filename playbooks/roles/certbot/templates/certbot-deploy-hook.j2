@@ -1,0 +1,10 @@
+#!/bin/bash
+
+set -e
+
+PLAYBOOK_USER={{ certbot_playbook_user }}
+PLAYBOOK_DIR={{ certbot_playbook_dir }}
+
+cd $PLAYBOOK_DIR
+sudo -Hu ${PLAYBOOK_USER} ansible-playbook certbot-deploy-hook.yml \
+        -e certbot_cert_dir=${RENEWED_LINEAGE}
