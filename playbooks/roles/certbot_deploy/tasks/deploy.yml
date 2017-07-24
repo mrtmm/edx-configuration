@@ -1,0 +1,16 @@
+---
+- name: deploy certificates
+  copy:
+    src: "{{ certbot_cert_path }}"
+    dest: "/etc/ssl/certs/{{ certbot_cert_name }}.pem"
+    mode: 0644
+  notify:
+    - reload nginx
+
+- name: deploy private key
+  copy:
+    src: "{{ certbot_key_path }}"
+    dest: "/etc/ssl/private/{{ certbot_cert_name }}.key"
+    mode: 0640
+  notify:
+    - reload nginx

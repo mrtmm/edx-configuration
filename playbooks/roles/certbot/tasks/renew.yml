@@ -1,0 +1,10 @@
+---
+- name: renew via webroot
+  shell: >
+    certbot renew
+    --non-interactive 
+    --webroot
+    --webroot-path={{ certbot_webroot_path }}
+    --cert-name "{{ certbot_cert_name }}"
+
+- include: permissions.yml

@@ -1,0 +1,11 @@
+---
+- name: generate via webroot
+  shell: >
+    certbot certonly
+    --non-interactive 
+    --webroot
+    --webroot-path "{{ certbot_webroot_path }}"
+    --cert-name "{{ certbot_cert_name }}"
+    --domains "{{ certbot_domains|join(",") }}"
+
+- include: permissions.yml

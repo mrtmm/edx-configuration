@@ -1,0 +1,32 @@
+---
+- name: add certbot ppa
+  apt_repository:
+    repo: "{{ certbot_repo }}"
+
+- name: install packages
+  apt:
+    name: "{{ item }}"
+    state: present
+    update_cache: yes
+  with_items:
+    - nginx
+    - certbot
+
+- name: registration details
+  shell: >
+    certbot register
+    --agree-tos
+    --update-registration
+    --email {{ certbot_email }}
+    --no-eff-email
+
+- name: stat cert
+  stat:
+    path: "{{ certbot_cert_path }}"
+  register: cert
+
+- include: certonly.yml
+  when: not cert.stat.exists and certbot_generate
+
+- include: renew.yml
+  when: cert.stat.exists and certbot_renew

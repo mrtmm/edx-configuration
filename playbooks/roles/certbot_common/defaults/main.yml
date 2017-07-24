@@ -1,0 +1,15 @@
+---
+certbot_repo: "ppa:certbot/certbot"
+certbot_webroot_uri: "/.well-known/acme-challenge/"
+certbot_webroot_host: "deploy"
+certbot_webroot_path: "/var/www/html"
+certbot_conf_dir: "/etc/letsencrypt"
+certbot_cert_dir: "{{ certbot_conf_dir }}/live/{{ certbot_cert_name }}"
+certbot_cert_path: "{{ certbot_cert_dir }}/fullchain.pem"
+certbot_key_path: "{{ certbot_cert_dir }}/privkey.pem"
+certbot_generate: false
+certbot_renew: false
+certbot_deploy: false
+certbot_email: ""
+certbot_cert_name: ""
+certbot_domains: []

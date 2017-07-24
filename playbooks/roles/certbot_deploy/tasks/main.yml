@@ -1,0 +1,33 @@
+---
+- name: nginx pre include
+  template:
+    src: nginx_include_pre.j2
+    dest: "{{ COMMON_APP_DIR }}/nginx/include/{{ item }}-pre/certbot"
+    owner: root
+    group: "{{ common_web_group }}"
+  with_items:
+    - lms
+    - cms
+  notify:
+    - reload nginx
+
+- name: nginx include
+  template:
+    src: nginx_include.j2
+    dest: "{{ COMMON_APP_DIR }}/nginx/include/{{ item }}/certbot"
+    owner: root
+    group: "{{ common_web_group }}"
+  with_items:
+    - lms
+    - cms
+  notify:
+    - reload nginx
+
+- name: stat cert
+  stat:
+    path: "{{ certbot_cert_path }}"
+  register: cert
+  delegate_to: localhost
+
+- include: deploy.yml
+  when: cert.stat.exists and certbot_deploy
