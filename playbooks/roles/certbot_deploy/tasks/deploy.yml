@@ -14,3 +14,9 @@
     mode: 0640
   notify:
     - reload nginx
+
+- name: backup certs
+  include_role:
+    name: certbot_common
+    tasks_from: backup
+  delegate_to: localhost
