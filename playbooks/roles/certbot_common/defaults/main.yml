@@ -7,6 +7,11 @@ certbot_conf_dir: "/etc/letsencrypt"
 certbot_cert_dir: "{{ certbot_conf_dir }}/live/{{ certbot_cert_name }}"
 certbot_cert_path: "{{ certbot_cert_dir }}/fullchain.pem"
 certbot_key_path: "{{ certbot_cert_dir }}/privkey.pem"
+certbot_deploy_playbook_user: "ubuntu"
+certbot_deploy_playbook_dir: "/home/ubuntu/edx-configuration/playbooks"
+certbot_deploy_playbook_inventory_file: "/home/ubuntu/edx-configuration-secrets/openstack.py"
+certbot_deploy_playbook_target: "app_servers"
+certbot_renew_hook_path: "/usr/local/bin/certbot-renew-hook"
 certbot_generate: false
 certbot_renew: false
 certbot_deploy: false

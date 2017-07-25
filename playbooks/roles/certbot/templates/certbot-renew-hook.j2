@@ -1,0 +1,16 @@
+#!/bin/bash
+
+set -e
+
+PLAYBOOK_USER={{ certbot_deploy_playbook_user }}
+PLAYBOOK_DIR={{ certbot_deploy_playbook_dir }}
+PLAYBOOK_INVENTORY={{ certbot_deploy_playbook_inventory_file }}
+PLAYBOOK_TARGET={{ certbot_deploy_playbook_target }}
+
+cd $PLAYBOOK_DIR
+sudo -Hu ${PLAYBOOK_USER} ansible-playbook run_role.yml \
+        -i ${PLAYBOOK_INVENTORY} \
+        -l ${PLAYBOOK_TARGET} \
+        -e role=certbot_deploy \
+        -e certbot_deploy=True \
+        -e certbot_cert_name=${RENEWED_LINEAGE}

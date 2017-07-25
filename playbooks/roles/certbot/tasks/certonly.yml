@@ -8,4 +8,7 @@
     --cert-name "{{ certbot_cert_name }}"
     --domains "{{ certbot_domains|join(",") }}"
 
-- include: permissions.yml
+- name: fix permissions
+  include_role:
+    name: certbot_common
+    tasks_from: permissions

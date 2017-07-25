@@ -23,6 +23,12 @@
   notify:
     - reload nginx
 
+- name: fix permissions
+  include_role:
+    name: certbot_common
+    tasks_from: permissions
+  delegate_to: localhost
+
 - name: stat cert
   stat:
     path: "{{ certbot_cert_path }}"
