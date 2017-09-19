@@ -13,4 +13,4 @@ sudo -Hu ${PLAYBOOK_USER} ansible-playbook run_role.yml \
         -l ${PLAYBOOK_TARGET} \
         -e role=certbot_deploy \
         -e certbot_deploy=True \
-        -e certbot_cert_name=${RENEWED_LINEAGE}
+        -e certbot_cert_dir=${RENEWED_LINEAGE}
