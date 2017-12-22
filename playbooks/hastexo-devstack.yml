@@ -5,14 +5,18 @@
   vars:
     migrate_db: 'yes'
     devstack: true
+    edx_django_service_is_devstack: true
     disable_edx_services: true
     mongo_enable_journal: false
     EDXAPP_NO_PREREQ_INSTALL: 0
-    COMMON_MOTD_TEMPLATE: 'devstack_motd.tail.j2'
     COMMON_SSH_PASSWORD_AUTH: "yes"
     EDXAPP_LMS_BASE: 127.0.0.1:8000
     EDXAPP_OAUTH_ENFORCE_SECURE: false
     EDXAPP_LMS_BASE_SCHEME: http
+    MONGO_AUTH: false
+    COMMON_SECURITY_UPDATES: true
+    SECURITY_UPGRADE_ON_ANSIBLE: true
+    DISCOVERY_URL_ROOT: 'http://localhost:{{ DISCOVERY_NGINX_PORT }}'
   roles:
     - common
     - vhost
@@ -20,12 +24,15 @@
     - edxlocal
     - memcache
     - mongo
-    - { role: 'rabbitmq', rabbitmq_ip: '127.0.0.1' }
+    - role: rabbitmq
+      rabbitmq_ip: 127.0.0.1
     - edxapp
     - oraclejdk
     - elasticsearch
     - forum
+    - discovery
     - role: notifier
       NOTIFIER_DIGEST_TASK_INTERVAL: "5"
     - local_dev
+    - demo
     - gateone
