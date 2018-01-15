@@ -1,0 +1,32 @@
+---
+- name: Install requirements
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - openjdk-8-jdk-headless
+    - tomcat8
+    - maven
+
+- name: Checkout repository
+  git:
+    repo: "{{ hastexo_xblock_repo }}"
+    version: "v{{ hastexo_xblock_version }}"
+    dest: /tmp/hastexo-xblock
+
+- name: Build package
+  command: mvn package
+  args:
+    chdir: /tmp/hastexo-xblock/guacamole
+
+- name: Copy war file
+  copy:
+    remote_src: yes
+    src: /tmp/hastexo-xblock/guacamole/target/hastexo-xblock-{{ hastexo_xblock_version }}.war
+    dest: /var/lib/tomcat8/webapps/hastexo-xblock.war
+
+- name: Restart tomcat8
+  systemd:
+    name: tomcat8
+    enabled: yes
+    state: restarted
