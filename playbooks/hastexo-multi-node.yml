@@ -53,7 +53,8 @@
     - { role: 'xqueue', update_users: True }
     - certs
     - postfix
-    - gateone
+    - guacd
+    - hastexo_xblock
 
 - name: Stop all services on app master
   hosts: app_master
