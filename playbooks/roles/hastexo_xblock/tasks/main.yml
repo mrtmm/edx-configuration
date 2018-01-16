@@ -30,3 +30,13 @@
     name: tomcat8
     enabled: yes
     state: restarted
+
+- name: Nginx include
+  template:
+    src=hastexo_xblock.j2
+    dest="{{ COMMON_APP_DIR }}/nginx/include/lms/hastexo-xblock"
+    owner=root
+    group="{{ common_web_group }}"
+  notify:
+    - restart nginx
+  when: not devstack
