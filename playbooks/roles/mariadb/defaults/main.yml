@@ -39,6 +39,7 @@ MARIADB_DATABASES:
   - "{{ ANALYTICS_API_REPORTS_DB_NAME | default(None) }}"
   - "{{ CREDENTIALS_DEFAULT_DB_NAME | default(None) }}"
   - "{{ DISCOVERY_DEFAULT_DB_NAME | default(None) }}"
+  - "{{ NOTIFIER_DATABASE_NAME | default(None) }}"
 
 MARIADB_USERS:
   - {
@@ -85,6 +86,11 @@ MARIADB_USERS:
       db: "{{ DISCOVERY_DEFAULT_DB_NAME | default(None) }}",
       user: "{{ DISCOVERY_MYSQL_USER | default(None) }}",
       pass: "{{ DISCOVERY_MYSQL_PASSWORD | default(None) }}"
+    }
+  - {
+      db: "{{ NOTIFIER_DATABASE_NAME | default(None) }}",
+      user: "{{ NOTIFIER_DATABASE_USER | default(None) }}",
+      pass: "{{ NOTIFIER_DATABASE_PASSWORD | default(None) }}"
     }
 
 #
