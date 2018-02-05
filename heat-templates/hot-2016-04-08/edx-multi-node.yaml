@@ -351,7 +351,8 @@ resources:
   # App servers are named app0 ... appN, where N == app_count - 1.
   app_servers:
     type: OS::Heat::ResourceGroup
-    depends_on: management_sub_net
+    depends_on:
+      - management_sub_net
     properties:
       count: { get_param: app_count }
       resource_def:
@@ -375,6 +376,8 @@ resources:
     type: OS::Neutron::LBaaS::LoadBalancer
     properties:
       vip_subnet: { get_resource: management_sub_net }
+    depends_on:
+      - management_sub_net
 
   app_server_http_listener:
     type: OS::Neutron::LBaaS::Listener
@@ -396,6 +399,8 @@ resources:
       lb_algorithm: LEAST_CONNECTIONS
       listener: { get_resource: app_server_http_listener }
       protocol: TCP
+    depends_on:
+      - app_server_lb
 
   app_server_https_pool:
     type: OS::Neutron::LBaaS::Pool
@@ -403,6 +408,8 @@ resources:
       lb_algorithm: LEAST_CONNECTIONS
       listener: { get_resource: app_server_https_listener }
       protocol: TCP
+    depends_on:
+      - app_server_lb
 
   app_server_http_monitor:
     type: OS::Neutron::LBaaS::HealthMonitor
