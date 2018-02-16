@@ -25,7 +25,7 @@ db.auth( '{{ MONGO_ADMIN_USER }}', '{{ MONGO_ADMIN_PASSWORD }}');
 
 config = {_id: '{{ mongo_repl_set }}', members: [
        {%- for host in hosts -%}
-       {_id: {{ loop.index }}, host: '{{ host }}'}{% if not loop.last %},{% endif %}
+       {_id: {{ loop.index }}, host: '{{ host }}', priority: {{ loop.revindex }}}{% if not loop.last %},{% endif %}
        {%- endfor -%}
            ]};
 rs.initiate(config)
