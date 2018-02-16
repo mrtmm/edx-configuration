@@ -10,6 +10,7 @@
     - "hugepages"
     - "install"
     - "install:configuration"
+  when: mongo_disable_transparent_hugepages
 
 - name: Enable/start disable transparent huge pages service (http://docs.mongodb.org/manual/tutorial/transparent-huge-pages/)
   service:
@@ -20,6 +21,7 @@
     - "hugepages"
     - "manage"
     - "manage:start"
+  when: mongo_disable_transparent_hugepages
 
 - name: install python pymongo for mongo_user ansible module
   pip:
