@@ -45,6 +45,13 @@
     - install
     - install:base
 
+- name: Install elasticsearch requirements
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - openjdk-8-jdk-headless
+
 - name: install elasticsearch
   apt:
     pkg: "{{ elasticsearch_package_name }}={{ ELASTICSEARCH_VERSION }}"
