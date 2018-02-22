@@ -15,7 +15,6 @@
   roles:
     - common
     - mongo
-    - oraclejdk
     - elasticsearch
     - { role: 'mariadb', MARIADB_CREATE_DBS: 'yes' }
     - memcache
