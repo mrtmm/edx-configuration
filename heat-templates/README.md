@@ -160,15 +160,15 @@ node, go back to your installed node and:
             os_region_name: ""
     ```
 
-2. Check out the `hastexo/integration/base` branch of edx-configuration, which
-   contains the `gateone` role:
+2. Check out the `hastexo/ginkgo-integration/base` branch of edx-configuration, which
+   contains the `hastexo_xblock` role:
 
     ```
     $ cd /var/tmp/edx-configuration
-    $ git checkout -b hastexo/integration/base origin/hastexo/integration/base
+    $ git checkout -b hastexo/ginkgo-integration/base origin/hastexo/ginkgo-integration/base
     ```
 
-3. Add the `gateone` role to `openstack-single-node.yml` and rerun that
+3. Add the `hastexo_xblock` role to `openstack-single-node.yml` and rerun that
    playbook:
 
     ```
@@ -177,7 +177,7 @@ node, go back to your installed node and:
      ...
      - certs
      - demo
-     - gateone
+     - hastexo_xblock
     $ ansible-playbook -i ../../edx-configuration-secrets/inventory.ini -c local openstack-single-node.yaml
     ```
 
@@ -222,14 +222,14 @@ openstack stack output show $stack deploy_ip
 ssh ubuntu@<deploy_ip> -A
 ```
 
-Before you continue, you'll need the `hastexo/integration/base` fork of
+Before you continue, you'll need the `hastexo/ginkgo-integration/base` fork of
 `edx-configuration`.  Clone it, and then enable the sample group and host
 variables, which will configure this deployment of Open edX.  Due to how
 Ansible variable precedence works, it is recommended that you copy the sample
 ones to a separate directory:
 
 ```
-git clone https://github.com/hastexo/edx-configuration.git -b hastexo/integration/base
+git clone https://github.com/hastexo/edx-configuration.git -b hastexo/ginkgo-integration/base
 cp -a edx-configuration/playbooks/openstack edx-configuration-secrets
 cd edx-configuration-secrets/group_vars
 for i in *.example; do cp $i ${i%.example}; done
@@ -397,7 +397,7 @@ node cluster, go back to your deploy node and:
             os_region_name: ""
     ```
 
-2. Add the `gateone` role to `openstack-multi-node.yml` under the `app_servers`
+2. Add the `hastexo_xblock` role to `openstack-multi-node.yml` under the `app_servers`
    section (the last one).
 
     ```
@@ -407,7 +407,7 @@ node cluster, go back to your deploy node and:
     - certs
     - demo
     - oauth_client_setup
-    - gateone
+    - hastexo_xblock
     ```
 
 3. Run that playbook, limitting the run to the `app_servers`:

@@ -4,15 +4,12 @@ secure_dir: "../../edx-configuration-secrets"
 
 # Repos
 edx_platform_repo: "https://{{ COMMON_GIT_MIRROR }}/edx/edx-platform.git"
-edx_platform_version: "master"
-CERTS_REPO: "https://{{ COMMON_GIT_MIRROR }}/edx/edx-certificates.git"
-certs_version: "master"
-forum_source_repo: "https://{{ COMMON_GIT_MIRROR }}/edx/cs_comments_service.git"
-forum_version: "master"
+edx_platform_version: "open-release/ginkgo.2"
 xqueue_source_repo: "https://{{ COMMON_GIT_MIRROR }}/edx/xqueue.git"
-xqueue_version: "master"
-NOTIFIER_SOURCE_REPO: "https://{{ COMMON_GIT_MIRROR }}/edx/notifier.git"
-NOTIFIER_VERSION: "master"
+xqueue_version: "open-release/ginkgo.2"
+certs_version: "open-release/ginkgo.2"
+forum_version: "open-release/ginkgo.2"
+NOTIFIER_VERSION: "open-release/ginkgo.2"
 
 # Mongo
 EDXAPP_MONGO_DB_NAME: 'edxapp'
@@ -43,6 +40,8 @@ COMMON_BIN_DIR: "{{ COMMON_BASE_DIR }}/bin"
 COMMON_CFG_DIR: "{{ COMMON_BASE_DIR }}/etc"
 COMMON_ENVIRONMENT: 'default_env'
 COMMON_DEPLOYMENT: 'default_deployment'
+COMMON_GIT_MIRROR: 'github.com'
+COMMON_GIT_PROTOCOL: 'https'
 COMMON_ENABLE_DATADOG: False
 COMMON_ENABLE_SPLUNKFORWARDER: False
 COMMON_SECURITY_UPDATES: False
@@ -137,14 +136,15 @@ NGINX_SSL_CERTIFICATE: "{{ secure_dir }}/files/wildcard.example.com.pem"
 NGINX_SSL_KEY: "{{ secure_dir }}/files/wildcard.example.com.key"
 
 # Edxapp
+edxapp_user: edxapp
 EDXAPP_EDX_API_KEY: "PUT_YOUR_API_KEY_HERE"
 EDXAPP_EDXAPP_SECRET_KEY: "DUMMY KEY CHANGE BEFORE GOING TO PRODUCTION"
 EDXAPP_LMS_NGINX_PORT: 80
 EDXAPP_LMS_SSL_NGINX_PORT: 443
 EDXAPP_CMS_NGINX_PORT: 80
 EDXAPP_CMS_SSL_NGINX_PORT: 443
-EDXAPP_ALLOW_ALL_ADVANCED_COMPONENTS: True
 EDXAPP_ENABLE_SYSADMIN_DASHBOARD: True
+EDXAPP_ALLOW_HIDING_DISCUSSION_TAB: True
 EDXAPP_COURSE_CATALOG_VISIBILITY_PERMISSION: "see_in_catalog"
 EDXAPP_COURSE_ABOUT_VISIBILITY_PERMISSION: "see_about_page"
 EDXAPP_SITE_NAME: "lms.example.com"
@@ -206,6 +206,8 @@ EDXAPP_CELERY_WORKERS:
     monitor: False
     max_tasks_per_child: 1
 EDXAPP_ANALYTICS_DASHBOARD_URL: ""
+EDXAPP_COMMENTS_SERVICE_KEY: 'password'
+EDXAPP_TIME_ZONE: "UTC"
 
 # Edxapp OAuth2
 EDXAPP_ENABLE_THIRD_PARTY_AUTH: False
@@ -236,19 +238,19 @@ EDXAPP_ADDL_INSTALLED_APPS:
   - 'hastexo'
 EDXAPP_XBLOCK_SETTINGS:
   hastexo:
-    terminal_url: "{{ gateone_url_prefix }}"
-    ssh_dir: "{{ gateone_user_dir }}/ANONYMOUS/.ssh"
-    ssh_upload: True
-    ssh_bucket: "identities"
-    launch_timeout: 300
+    terminal_url: "{{ hastexo_xblock_url }}"
+    launch_timeout: 900
     suspend_timeout: 120
+    suspend_interval: 60
+    suspend_concurrency: 4
+    suspend_in_parallel: true
     task_timeouts:
-      sleep: 5
-      retries: 60
+      sleep: 10
+      retries: 90
     js_timeouts:
-      status: 10000
-      keepalive: 15000
-      idle: 600000
+      status: 15000
+      keepalive: 30000
+      idle: 3600000
       check: 5000
     providers:
       default:
@@ -265,10 +267,9 @@ EDXAPP_XBLOCK_SETTINGS:
         os_project_domain_name: ""
         os_region_name: ""
 
-# Gateone
-gateone_user_dir: "{{COMMON_DATA_DIR }}/edxapp/terminal_users"
-gateone_url_prefix: "/terminal"
-gateone_port: 28010
+# Terminal
+hastexo_xblock_url: "/hastexo-xblock/"
+hastexo_xblock_port: 8080
 
 # Log sync
 COMMON_OBJECT_STORE_LOG_SYNC: False
@@ -332,3 +333,21 @@ XQUEUE_SWIFT_USE_TEMP_URLS: "{{ EDXAPP_SWIFT_USE_TEMP_URLS }}"
 XQUEUE_SWIFT_TEMP_URL_KEY: "{{ EDXAPP_SWIFT_TEMP_URL_KEY }}"
 XQUEUE_SWIFT_AUTO_CREATE_CONTAINER: "{{ EDXAPP_SWIFT_AUTO_CREATE_CONTAINER }}"
 XQUEUE_SWIFT_AUTO_CREATE_CONTAINER_PUBLIC: False
+
+# Forum
+FORUM_API_KEY: "{{ EDXAPP_COMMENTS_SERVICE_KEY }}"
+
+# Notifier
+NOTIFIER_DATABASE_NAME: "notifier"
+NOTIFIER_DATABASE_ENGINE: "django.db.backends.mysql"
+NOTIFIER_DATABASE_USER: "notifier"
+NOTIFIER_DATABASE_PASSWORD: "password"
+NOTIFIER_DATABASE_HOST: "localhost"
+NOTIFIER_DATABASE_PORT: 3306
+NOTIFIER_DIGEST_EMAIL_SENDER: "notifications@example.com"
+NOTIFIER_LMS_URL_BASE: "http://localhost:8000"
+NOTIFIER_LMS_SECRET_KEY: "{{ EDXAPP_EDXAPP_SECRET_KEY }}"
+NOTIFIER_COMMENT_SERVICE_BASE: "http://localhost:18080"
+NOTIFIER_COMMENT_SERVICE_API_KEY: "{{ EDXAPP_COMMENTS_SERVICE_KEY }}"
+NOTIFIER_USER_SERVICE_BASE: "http://localhost:8000"
+NOTIFIER_USER_SERVICE_API_KEY: "{{ EDXAPP_EDX_API_KEY }}"
