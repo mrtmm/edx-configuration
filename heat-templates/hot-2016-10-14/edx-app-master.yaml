@@ -67,7 +67,17 @@ resources:
     properties:
       cloud_config:
         merge_how: 'dict(recurse_array,no_replace)+list(append)'
+        write_files:
+          - path: /tmp/stop_edx_workers.sh
+            permissions: '0755'
+            content: |
+              #!/bin/bash
+              if [ -e /edx/bin/supervisorctl ]; then
+                /edx/bin/supervisorctl stop suspender:
+                /edx/bin/supervisorctl stop edxapp_worker:
+              fi
         runcmd:
+          - [ /tmp/stop_edx_workers.sh ]
           - { get_attr: ['server_done_handle', 'curl_cli'] }
 
   # server_cloud_config: complete cloud-init configuration for this servers.
