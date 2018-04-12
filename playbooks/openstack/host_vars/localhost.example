@@ -244,6 +244,10 @@ EDXAPP_XBLOCK_SETTINGS:
     suspend_interval: 60
     suspend_concurrency: 4
     suspend_in_parallel: true
+    check_timeout: 120
+    delete_age: 14
+    delete_attempts: 3
+    delete_interval: 86400
     task_timeouts:
       sleep: 10
       retries: 90
