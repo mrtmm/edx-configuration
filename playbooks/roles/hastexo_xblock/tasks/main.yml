@@ -41,23 +41,29 @@
     - restart nginx
   when: not devstack
 
-- name: "Suspender supervisor script"
+- name: "Supervisor scripts"
   template:
-    src: "suspender.conf.j2"
-    dest: "{{ supervisor_available_dir }}/suspender.conf"
+    src: "{{ item }}.conf.j2"
+    dest: "{{ supervisor_available_dir }}/{{ item }}.conf"
     owner: "{{ supervisor_user }}"
     group: "{{ common_web_user }}"
     mode: "0644"
+  with_items:
+    - suspender
+    - undertaker
 
-- name: "Enable supervisor script"
+- name: "Enable supervisor scripts"
   file:
-    src: "{{ supervisor_available_dir }}/suspender.conf"
-    dest: "{{ supervisor_cfg_dir }}/suspender.conf"
+    src: "{{ supervisor_available_dir }}/{{ item }}.conf"
+    dest: "{{ supervisor_cfg_dir }}/{{ item }}.conf"
     owner: "{{ supervisor_user }}"
     group: "{{ common_web_user }}"
     mode: "0644"
     state: link
     force: yes
+  with_items:
+    - suspender
+    - undertaker
   when: not disable_edx_services
 
 - name: Update supervisor configuration
@@ -66,6 +72,9 @@
   changed_when: supervisor_update.stdout is defined and supervisor_update.stdout != ""
   when: not disable_edx_services
 
-- name: Restart suspender
-  shell:  "{{ supervisor_ctl }} -c {{ supervisor_cfg }} restart suspender:"
+- name: Restart supervisor services
+  shell:  "{{ supervisor_ctl }} -c {{ supervisor_cfg }} restart {{ item }}:"
+  with_items:
+    - suspender
+    - undertaker
   when: not disable_edx_services
