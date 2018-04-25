@@ -12,13 +12,27 @@
     - nginx
     - certbot
 
-- name: registration details
+- name: check if configuration exists
+  stat:
+    path: "{{ certbot_conf_dir }}"
+  register: config
+
+- name: create registration details
+  shell: >
+    certbot register
+    --agree-tos
+    --email {{ certbot_email }}
+    --no-eff-email
+  when: config.stat.isdir is not defined
+
+- name: update registration details
   shell: >
     certbot register
     --agree-tos
     --update-registration
     --email {{ certbot_email }}
     --no-eff-email
+  when: config.stat.isdir is defined and config.stat.isdir
 
 - name: renew hook script
   template:
