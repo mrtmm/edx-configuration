@@ -6,7 +6,7 @@
 - name: install packages
   apt:
     name: "{{ item }}"
-    state: present
+    state: latest
     update_cache: yes
   with_items:
     - nginx
@@ -15,7 +15,20 @@
 - name: check if configuration exists
   stat:
     path: "{{ certbot_conf_dir }}"
-  register: config
+  register: c1
+
+- name: restore configuration
+  include_role:
+    name: certbot_common
+    tasks_from: restore
+  delegate_to: localhost
+  when:
+    - c1.stat.isdir is not defined or not c1.stat.isdir
+
+- name: check if configuration was restored
+  stat:
+    path: "{{ certbot_conf_dir }}"
+  register: c2
 
 - name: create registration details
   shell: >
@@ -23,7 +36,8 @@
     --agree-tos
     --email {{ certbot_email }}
     --no-eff-email
-  when: config.stat.isdir is not defined
+  when:
+    - c2.stat.isdir is not defined or not c2.stat.isdir
 
 - name: update registration details
   shell: >
@@ -32,33 +46,60 @@
     --update-registration
     --email {{ certbot_email }}
     --no-eff-email
-  when: config.stat.isdir is defined and config.stat.isdir
+  when: 
+    - c2.stat.isdir is defined
+    - c2.stat.isdir
 
-- name: renew hook script
+- name: deploy hook dir
+  file:
+    path: "{{ certbot_deploy_hook_dir }}"
+    state: directory
+    recurse: yes
+
+- name: deploy hook
   template:
-    src: certbot-renew-hook.j2
-    dest: "{{ certbot_renew_hook_path }}"
+    src: certbot-deploy-hook.j2
+    dest: "{{ certbot_deploy_hook }}"
     mode: 0775
 
 - name: service override dir
   file:
     path: /etc/systemd/system/certbot.service.d
-    state: directory
-
-- name: service override
-  template:
-    src: certbot-renew-service-override.j2
-    dest: /etc/systemd/system/certbot.service.d/override.conf
-    mode: 0644
+    state: absent
   notify: reload certbot
 
 - name: stat cert
   stat:
     path: "{{ certbot_cert_path }}"
-  register: cert
+  register: c3
 
-- include: certonly.yml
-  when: not cert.stat.exists and certbot_generate
+- name: generate via webroot
+  shell: >
+    certbot certonly
+    --non-interactive
+    --webroot
+    --webroot-path "{{ certbot_webroot_path }}"
+    --cert-name "{{ certbot_cert_name }}"
+    --domains "{{ certbot_domains|join(",") }}"
+  when:
+    - c3.stat.exists is not defined
 
-- include: renew.yml
-  when: cert.stat.exists and certbot_renew
+- name: renew via webroot
+  shell: >
+    certbot renew
+    --non-interactive 
+    --webroot
+    --webroot-path={{ certbot_webroot_path }}
+    --cert-name "{{ certbot_cert_name }}"
+  when:
+    - c3.stat.exists is defined
+
+- name: fix permissions
+  include_role:
+    name: certbot_common
+    tasks_from: permissions
+
+- name: backup certs
+  include_role:
+    name: certbot_common
+    tasks_from: backup

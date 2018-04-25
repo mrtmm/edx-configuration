@@ -1,4 +1,33 @@
 ---
+- name: check if local configuration exists
+  stat:
+    path: "{{ certbot_conf_dir }}"
+  register: d1
+  delegate_to: localhost
+
+- name: restore configuration
+  include_role:
+    name: certbot_common
+    tasks_from: restore
+  delegate_to: localhost
+  when:
+    - d1.stat.isdir is not defined or not d1.stat.isdir
+
+- name: fix local configuration permissions
+  include_role:
+    name: certbot_common
+    tasks_from: permissions
+  delegate_to: localhost
+  when:
+    - d1.stat.isdir is defined
+    - d1.stat.isdir
+
+- name: stat cert
+  stat:
+    path: "{{ certbot_cert_path }}"
+  register: d2
+  delegate_to: localhost
+
 - name: deploy certificates
   copy:
     src: "{{ certbot_cert_path }}"
@@ -6,6 +35,8 @@
     mode: 0644
   notify:
     - reload nginx
+  when:
+    - d2.stat.exists is defined
 
 - name: deploy private key
   copy:
@@ -14,9 +45,5 @@
     mode: 0640
   notify:
     - reload nginx
-
-- name: backup certs
-  include_role:
-    name: certbot_common
-    tasks_from: backup
-  delegate_to: localhost
+  when:
+    - d2.stat.exists is defined

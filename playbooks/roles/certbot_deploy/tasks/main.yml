@@ -23,24 +23,5 @@
   notify:
     - reload nginx
 
-- name: check if local configuration exists
-  stat:
-    path: "{{ certbot_conf_dir }}"
-  register: config
-  delegate_to: localhost
-
-- name: fix local configuration permissions
-  include_role:
-    name: certbot_common
-    tasks_from: permissions
-  delegate_to: localhost
-  when: config.stat.isdir is defined and config.stat.isdir
-
-- name: stat cert
-  stat:
-    path: "{{ certbot_cert_path }}"
-  register: cert
-  delegate_to: localhost
-
 - include: deploy.yml
-  when: cert.stat.exists and certbot_deploy
+  when: certbot_deploy
