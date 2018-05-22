@@ -50,7 +50,7 @@
     mode: "0644"
   with_items:
     - suspender
-    - undertaker
+    - reaper
 
 - name: "Enable supervisor scripts"
   file:
@@ -63,7 +63,7 @@
     force: yes
   with_items:
     - suspender
-    - undertaker
+    - reaper
   when: not disable_edx_services
 
 - name: Update supervisor configuration
@@ -76,5 +76,5 @@
   shell:  "{{ supervisor_ctl }} -c {{ supervisor_cfg }} restart {{ item }}:"
   with_items:
     - suspender
-    - undertaker
+    - reaper
   when: not disable_edx_services
