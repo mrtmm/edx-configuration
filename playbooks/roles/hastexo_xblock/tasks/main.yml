@@ -14,6 +14,12 @@
     version: "v{{ hastexo_xblock_version }}"
     dest: /tmp/hastexo-xblock
 
+- name: Configure CORS
+  template:
+    src: web.xml.j2
+    dest: /tmp/hastexo-xblock/guacamole/src/main/webapp/WEB-INF/web.xml
+  when: NGINX_REDIRECT_TO_HTTPS and not devstack
+
 - name: Build package
   command: mvn package
   args:
