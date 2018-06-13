@@ -1,0 +1,4 @@
+---
+- name: Install openjdk package
+  apt:
+    name: "{{ openjdk_package }}"
