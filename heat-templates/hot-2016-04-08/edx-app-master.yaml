@@ -73,7 +73,7 @@ resources:
             content: |
               #!/bin/bash
               if [ -e /edx/bin/supervisorctl ]; then
-                /edx/bin/supervisorctl stop undertaker:
+                /edx/bin/supervisorctl stop reaper:
                 /edx/bin/supervisorctl stop suspender:
                 /edx/bin/supervisorctl stop edxapp_worker:
               fi
