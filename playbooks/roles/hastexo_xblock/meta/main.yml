@@ -2,4 +2,3 @@
 dependencies:
   - common_vars
   - supervisor
-  - edxapp
