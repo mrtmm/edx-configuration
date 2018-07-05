@@ -17,7 +17,10 @@
     - mongo
     - elasticsearch
     - { role: 'mariadb', MARIADB_CREATE_DBS: 'yes' }
-    - postfix
+    - role: postfix
+      when: POSTFIX_QUEUE_EXTERNAL_SMTP_HOST is not defined or POSTFIX_QUEUE_EXTERNAL_SMTP_HOST == ''
+    - role: postfix_queue
+      when: POSTFIX_QUEUE_EXTERNAL_SMTP_HOST != ''
     - memcache
 
 # RabbitMQ needs to be built serially
@@ -51,7 +54,10 @@
     - { role: notifier, NOTIFIER_DIGEST_TASK_INTERVAL: "5" }
     - { role: 'xqueue', update_users: True }
     - certs
-    - postfix
+    - role: postfix
+      when: POSTFIX_QUEUE_EXTERNAL_SMTP_HOST is not defined or POSTFIX_QUEUE_EXTERNAL_SMTP_HOST == ''
+    - role: postfix_queue
+      when: POSTFIX_QUEUE_EXTERNAL_SMTP_HOST != ''
     - guacd
     - hastexo_xblock
 
