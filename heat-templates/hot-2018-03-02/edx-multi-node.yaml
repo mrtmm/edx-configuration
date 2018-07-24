@@ -2,7 +2,7 @@
 # single deployment node, 3 backend servers backed by persistent
 # volumes, a configurable number of ephemeral application servers, and
 # a load balancing pool behind a floating IP.
-heat_template_version: 2016-10-14
+heat_template_version: 2018-03-02
 
 description: >
   Full Open edX deployment: 3 backend nodes, configurable
@@ -369,42 +369,42 @@ resources:
           subnet: { get_resource: management_sub_net }
           security_group: { get_resource: server_security_group }
 
-  # app_server_lb: Neutron LBaaS v2 load balancer
+  # app_server_lb: Octavia load balancer
   app_server_lb:
-    type: OS::Neutron::LBaaS::LoadBalancer
+    type: OS::Octavia::LoadBalancer
     properties:
       vip_subnet: { get_resource: management_sub_net }
 
   app_server_http_listener:
-    type: OS::Neutron::LBaaS::Listener
+    type: OS::Octavia::Listener
     properties:
       loadbalancer: { get_resource: app_server_lb }
       protocol: TCP
       protocol_port: { get_param: app_http_port }
 
   app_server_https_listener:
-    type: OS::Neutron::LBaaS::Listener
+    type: OS::Octavia::Listener
     properties:
       loadbalancer: { get_resource: app_server_lb }
       protocol: TCP
       protocol_port: { get_param: app_https_port }
 
   app_server_http_pool:
-    type: OS::Neutron::LBaaS::Pool
+    type: OS::Octavia::Pool
     properties:
       lb_algorithm: LEAST_CONNECTIONS
       listener: { get_resource: app_server_http_listener }
       protocol: TCP
 
   app_server_https_pool:
-    type: OS::Neutron::LBaaS::Pool
+    type: OS::Octavia::Pool
     properties:
       lb_algorithm: LEAST_CONNECTIONS
       listener: { get_resource: app_server_https_listener }
       protocol: TCP
 
   app_server_http_monitor:
-    type: OS::Neutron::LBaaS::HealthMonitor
+    type: OS::Octavia::HealthMonitor
     properties:
       type: TCP
       delay: 5
@@ -413,7 +413,7 @@ resources:
       timeout: 5
 
   app_server_https_monitor:
-    type: OS::Neutron::LBaaS::HealthMonitor
+    type: OS::Octavia::HealthMonitor
     properties:
       type: TCP
       delay: 5
@@ -421,7 +421,7 @@ resources:
       pool: { get_resource: app_server_https_pool }
       timeout: 5
 
-  # app_server_floating_ip: Neutron LBaaS floating IP address
+  # app_server_floating_ip: Octavia floating IP address
   #
   # Defines a floating IP address linked to the load balancer's
   # private virtual IP (VIP).
