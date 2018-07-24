@@ -1,22 +1,17 @@
-# This template defines an Open edX master application server.  It creates a
-# Nova instance of the defined flavor.  It is ephemeral and uses no persistent
-# storage.  It is meant to be created on demand, in the same stack where it is
-# to be configured.
+# This template defines an Open edX application server. It is meant to
+# be invoked from an OS::Heat::ResourceGroup. It creates a Nova
+# instance of the defined flavor, and plugs that instance into an
+# LBaaS pool. The Nova instance is ephemeral and uses no persistent
+# storage.
 heat_template_version: 2016-10-14
 
 description: >
-  Open edX application master server
+  Open edX application server
 
 parameters:
   name:
     type: string
     description: Name of the server
-  index:
-    type: string
-    description: Index of the server
-  ip_map:
-    type: json
-    description: Map of IPs
   image:
     type: string
     description: >
@@ -27,6 +22,21 @@ parameters:
     type: string
     description: Flavor to use for app servers
     default: m1.large
+  http_pool:
+    type: string
+    description: LBaaS HTTP pool
+  http_port:
+    type: number
+    description: Service HTTP port number
+  https_pool:
+    type: string
+    description: LBaaS HTTPS pool
+  https_port:
+    type: number
+    description: Service HTTPS port number
+  metadata:
+    type: json
+    description: Metadata injected into the virtual machine
   network:
     type: string
     description: Network used by the server
@@ -42,6 +52,9 @@ parameters:
     type: number
     description: Stack creation timeout (seconds)
     default: 900
+  subnet:
+    type: string
+    description: Subnet on which the load balancer will be located
 
 resources:
   # server_done: Wait condition to signal that the server has completed its
@@ -69,22 +82,11 @@ resources:
 
   # server_config_part: cloud-init configuration specific to this server
   server_config_part:
-    type: "OS::Heat::CloudConfig"
+    type: OS::Heat::CloudConfig
     properties:
       cloud_config:
         merge_how: 'dict(recurse_array,no_replace)+list(append)'
-        write_files:
-          - path: /tmp/stop_edx_workers.sh
-            permissions: '0755'
-            content: |
-              #!/bin/bash
-              if [ -e /edx/bin/supervisorctl ]; then
-                /edx/bin/supervisorctl stop reaper:
-                /edx/bin/supervisorctl stop suspender:
-                /edx/bin/supervisorctl stop edxapp_worker:
-              fi
         runcmd:
-          - [ /tmp/stop_edx_workers.sh ]
           - { get_attr: ['server_done_handle', 'curl_cli'] }
 
   # server_cloud_config: complete cloud-init configuration for this servers.
@@ -114,6 +116,7 @@ resources:
       flavor: { get_param: flavor }
       image: { get_param: image }
       key_name: { get_param: key_name }
+      metadata: { get_param: metadata }
       user_data: { get_resource: server_cloud_config }
       user_data_format: RAW
       networks: [ { port: { get_resource: server_port } } ]
@@ -124,8 +127,26 @@ resources:
       dns_name: { get_param: name }
       network: { get_param: network }
       security_groups: [ { get_param: security_group } ]
-      fixed_ips:
-        - ip_address: { get_param: [ ip_map, { get_param: index } ] }
+
+  # http(s)_member: Octavia pool membership
+  #
+  # Retrieves the primary IP address from the previously created server, and
+  # plugs it into the http and https load balancer pools.
+  http_member:
+    type: OS::Octavia::PoolMember
+    properties:
+      address: { get_attr: [ server, first_address ] }
+      pool: { get_param: http_pool }
+      protocol_port: { get_param: http_port }
+      subnet: { get_param: subnet }
+
+  https_member:
+    type: OS::Octavia::PoolMember
+    properties:
+      address: { get_attr: [ server, first_address ] }
+      pool: { get_param: https_pool }
+      protocol_port: { get_param: https_port }
+      subnet: { get_param: subnet }
 
 outputs:
   OS::stack_id:
@@ -133,3 +154,9 @@ outputs:
   server_ip:
     description: "Server's private IP address"
     value: { get_attr: [ server, first_address ] }
+  http_member:
+    description: Load balancer member details
+    value: { get_attr: [ http_member, show ] }
+  https_member:
+    description: Load balancer member details
+    value: { get_attr: [ https_member, show ] }

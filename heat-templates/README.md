@@ -317,10 +317,9 @@ ssh ubuntu@<deploy_ip>
 screen
 ```
 
-Be sure to run the `inventory.py` dynamic inventory generator, as opposed to
-the static `intentory.ini`, meant for single node deployments.  Also, set
-`migrate_db=yes` on this first run, to ensure that the databases and tables are
-properly created.
+Be sure to run the `inventory.py` dynamic inventory generator corresponding to
+the Heat template version in use.  Also, set `migrate_db=yes` on this first
+run, to ensure that the databases and tables are properly created.
 
 ```
 cd ~/edx-configuration/playbooks
