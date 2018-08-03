@@ -23,4 +23,4 @@
   notify:
     - reload nginx
   when:
-    - c.stat.exists is defined and c.stats.exists
+    - c.stat.exists is defined and c.stat.exists
