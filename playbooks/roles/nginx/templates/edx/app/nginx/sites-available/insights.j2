@@ -90,10 +90,14 @@ location @proxy_to_app {
   }
   {% endif %}
 
+  include {{ nginx_include_dir }}/insights-pre/*;
+
   # Execute the actual redirect
   if ($do_redirect_to_https = "true")
   {
   return 301 https://$host$request_uri;
   }
   {% endif %}
+
+  include {{ nginx_include_dir }}/insights/*;
 }
