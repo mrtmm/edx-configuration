@@ -22,28 +22,7 @@
     - d1.stat.isdir is defined
     - d1.stat.isdir
 
-- name: stat cert
-  stat:
-    path: "{{ certbot_cert_path }}"
-  register: d2
-  delegate_to: localhost
-
-- name: deploy certificates
-  copy:
-    src: "{{ certbot_cert_path }}"
-    dest: "/etc/ssl/certs/{{ certbot_cert_name }}.pem"
-    mode: 0644
-  notify:
-    - reload nginx
-  when:
-    - d2.stat.exists is defined
-
-- name: deploy private key
-  copy:
-    src: "{{ certbot_key_path }}"
-    dest: "/etc/ssl/private/{{ certbot_cert_name }}.key"
-    mode: 0640
-  notify:
-    - reload nginx
-  when:
-    - d2.stat.exists is defined
+- include: deploy_loop.yml
+  with_items: certbot_certs
+  loop_control:
+    loop_var: certbot_cert
