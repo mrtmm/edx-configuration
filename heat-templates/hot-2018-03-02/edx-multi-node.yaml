@@ -315,7 +315,7 @@ resources:
           name: backend%index%
           index: '%index%'
           ip_map: { get_param: backend_ips }
-          flavor: { get_param: app_master_flavor }
+          flavor: { get_param: backend_flavor }
           image: { get_param: backend_image }
           key_name: { get_param: key_name }
           metadata: { "metering.stack": { get_param: "OS::stack_id" } }
