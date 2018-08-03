@@ -11,6 +11,32 @@ server {
   listen {{ KIBANA_NGINX_PORT }};
   {% endif %}
 
+  # Nginx does not support nested condition or or conditions so
+  # there is an unfortunate mix of conditonals here.
+  {% if NGINX_REDIRECT_TO_HTTPS %}
+  {% if NGINX_HTTPS_REDIRECT_STRATEGY == "scheme" %}
+  # Redirect http to https over single instance
+  if ($scheme != "https")
+  {
+      set $do_redirect_to_https "true";
+  }
+  {% elif NGINX_HTTPS_REDIRECT_STRATEGY == "forward_for_proto" %}
+  # Forward to HTTPS if we're an HTTP request... and the server is behind ELB
+  if ($http_x_forwarded_proto = "http")
+  {
+      set $do_redirect_to_https "true";
+  }
+  {% endif %}
+
+  include {{ nginx_include_dir }}/kibana-pre/*;
+
+  # Execute the actual redirect
+  if ($do_redirect_to_https = "true")
+  {
+      return 301 https://$host$request_uri;
+  }
+  {% endif %}
+
   {% if KIBANA_BASIC_AUTH|bool %}
   auth_basic "Restricted Access";
   auth_basic_user_file {{ KIBANA_BASIC_AUTH_FILE }};
@@ -27,4 +53,6 @@ server {
       proxy_set_header Host $host;
       proxy_cache_bypass $http_upgrade;
   }
+
+  include {{ nginx_include_dir }}/kibana/*;
 }
