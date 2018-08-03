@@ -69,7 +69,7 @@
   notify: reload certbot
 
 - include: generate_loop.yml
-  with_items: certbot_certs
+  with_items: "{{ certbot_certs }}"
   loop_control: 
     loop_var: certbot_cert
 
