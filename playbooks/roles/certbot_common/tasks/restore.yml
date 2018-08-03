@@ -6,8 +6,8 @@
 
 - include: restore_conditional.yml
   when:
-    - r.stat.exists is defined
+    - r.stat.exists is defined and r.stat.exists
 
 - include: permissions.yml
   when:
-    - r.stat.exists is defined
+    - r.stat.exists is defined and r.stat.exists

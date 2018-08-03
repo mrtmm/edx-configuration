@@ -8,6 +8,7 @@
   with_items:
     - lms
     - cms
+    - insights
   notify:
     - reload nginx
 
@@ -20,6 +21,7 @@
   with_items:
     - lms
     - cms
+    - insights
   notify:
     - reload nginx
 
