@@ -68,31 +68,10 @@
     state: absent
   notify: reload certbot
 
-- name: stat cert
-  stat:
-    path: "{{ certbot_cert_path }}"
-  register: c3
-
-- name: generate via webroot
-  shell: >
-    certbot certonly
-    --non-interactive
-    --webroot
-    --webroot-path "{{ certbot_webroot_path }}"
-    --cert-name "{{ certbot_cert_name }}"
-    --domains "{{ certbot_domains|join(",") }}"
-  when:
-    - c3.stat.exists is not defined
-
-- name: renew via webroot
-  shell: >
-    certbot renew
-    --non-interactive 
-    --webroot
-    --webroot-path={{ certbot_webroot_path }}
-    --cert-name "{{ certbot_cert_name }}"
-  when:
-    - c3.stat.exists is defined
+- include: generate_loop.yml
+  with_items: certbot_certs
+  loop_control: 
+    loop_var: certbot_cert
 
 - name: fix permissions
   include_role:

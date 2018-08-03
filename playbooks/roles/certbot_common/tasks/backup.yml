@@ -4,22 +4,7 @@
     path: "{{ certbot_conf_dir }}"
   register: b1
 
-- name: stat cert
-  stat:
-    path: "{{ certbot_cert_path }}"
-    get_checksum: yes
-    follow: yes
-  register: b2
-
-- name: stat backup cert
-  stat:
-    path: "{{ certbot_backup_cert }}"
-    get_checksum: yes
-  register: b3
-
 - include: backup_conditional.yml
   when:
     - b1.stat.isdir is defined
     - b1.stat.isdir
-    - b2.stat.exists is defined
-    - b3.stat.exists is not defined or b3.stat.checksum != b2.stat.checksum
