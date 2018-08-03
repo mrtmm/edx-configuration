@@ -69,4 +69,6 @@ server {
 		  break;
 	  }
   }
+
+  include {{ nginx_include_dir }}/kibana/*;
 }
