@@ -75,4 +75,6 @@ location @proxy_to_app {
   add_header P3P '{{ NGINX_P3P_MESSAGE }}';
   
   {% include "handle-tls-redirect-and-ip-disclosure.j2" %}
+
+  include {{ nginx_include_dir }}/insights/*;
 }
