@@ -49,6 +49,12 @@ parameters:
     type: string
     description: Size of MongoDB volume
     default: 10
+  volume_deletion_policy:
+    type: string
+    description: >
+      Deletion policy for the volumes.  One of 'Delete', 'Retain', or
+      'Snapshot'.
+    default: Retain
   galera_vip:
     type: string
     description: Load-balanced virtual IP for MySQL/Galera
@@ -164,12 +170,14 @@ resources:
   # mysql_data: persistent storage volume for MySQL/MariaDB data
   mysql_data:
     type: OS::Cinder::Volume
+    deletion_policy: { get_param: volume_deletion_policy }
     properties:
       size: { get_param: mysql_size }
 
   # mongodb_data: persistent storage volume for MongoDB data
   mongodb_data:
     type: OS::Cinder::Volume
+    deletion_policy: { get_param: volume_deletion_policy }
     properties:
       size: { get_param: mongodb_size }
 
