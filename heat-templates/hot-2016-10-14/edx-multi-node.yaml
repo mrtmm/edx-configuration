@@ -97,6 +97,12 @@ parameters:
     type: string
     description: Size of MongoDB volumes
     default: 10
+  volume_deletion_policy:
+    type: string
+    description: >
+      Deletion policy for the volumes.  One of 'Delete', 'Retain', or
+      'Snapshot'.
+    default: Retain
   galera_vip:
     type: string
     description: Load-balanced virtual IP for MySQL/Galera
@@ -323,6 +329,7 @@ resources:
           security_group: { get_resource: server_security_group }
           mysql_size: { get_param: mysql_size }
           mongodb_size: { get_param: mongodb_size }
+          volume_deletion_policy: { get_param: volume_deletion_policy }
           galera_vip: { get_param: galera_vip }
           wait_condition_callback: { get_attr: ['backend_done_handle', 'curl_cli'] }
 
