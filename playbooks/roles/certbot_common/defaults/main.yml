@@ -14,3 +14,8 @@ certbot_deploy_hook: "{{ certbot_deploy_hook_dir }}/hastexo"
 certbot_deploy: false
 certbot_email: ""
 certbot_certs: []
+certbot_nginx_includes:
+  - lms
+  - cms
+  - insights
+  - kibana
