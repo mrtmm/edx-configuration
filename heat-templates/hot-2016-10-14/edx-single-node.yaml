@@ -12,9 +12,13 @@ parameters:
     type: string
     description: Flavor to use for the server
     default: m1.large
-  app_port:
+  app_http_port:
     type: number
-    description: Load balancer port for app servers
+    description: Load balancer HTTP port for app servers
+    default: 80
+  app_https_port:
+    type: number
+    description: Load balancer HTTPS port for app servers
     default: 443
   public_net_id:
     type: string
@@ -31,7 +35,6 @@ resources:
       name: server_security_group
       rules:
       - remote_mode: 'remote_group_id'
-        remote_group_id:
         direction: ingress
       - remote_ip_prefix: 0.0.0.0/0
         protocol: tcp
@@ -43,8 +46,13 @@ resources:
       - remote_ip_prefix: 0.0.0.0/0
         protocol: tcp
         direction: ingress
-        port_range_min: { get_param: app_port }
-        port_range_max: { get_param: app_port }
+        port_range_min: { get_param: app_http_port }
+        port_range_max: { get_param: app_http_port }
+      - remote_ip_prefix: 0.0.0.0/0
+        protocol: tcp
+        direction: ingress
+        port_range_min: { get_param: app_https_port }
+        port_range_max: { get_param: app_https_port }
 
   management_net:
     type: OS::Neutron::Net
