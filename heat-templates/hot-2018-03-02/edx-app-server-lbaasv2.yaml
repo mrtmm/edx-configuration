@@ -3,7 +3,7 @@
 # instance of the defined flavor, and plugs that instance into an
 # LBaaS pool. The Nova instance is ephemeral and uses no persistent
 # storage.
-heat_template_version: 2016-10-14
+heat_template_version: 2018-03-02
 
 description: >
   Open edX application server

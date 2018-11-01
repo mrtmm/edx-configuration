@@ -2,7 +2,7 @@
 # single deployment node, 3 backend servers backed by persistent
 # volumes, a configurable number of ephemeral application servers, and
 # a load balancing pool behind a floating IP.
-heat_template_version: 2016-10-14
+heat_template_version: 2018-03-02
 
 description: >
   Full Open edX deployment: 3 backend nodes, configurable
