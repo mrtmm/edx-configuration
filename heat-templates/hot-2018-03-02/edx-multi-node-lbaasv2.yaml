@@ -129,7 +129,7 @@ parameters:
   galera_vip:
     type: string
     description: Load-balanced virtual IP for MySQL/Galera
-    default: 192.168.122.110
+    default: 192.168.122.110/32
   timeout:
     type: number
     description: Stack creation timeout (seconds)
