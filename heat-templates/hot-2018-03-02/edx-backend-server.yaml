@@ -52,7 +52,7 @@ parameters:
   galera_vip:
     type: string
     description: Load-balanced virtual IP for MySQL/Galera
-    default: 192.168.122.110
+    default: 192.168.122.110/32
   wait_condition_callback:
     type: string
     description: Command to execute at end of initialization
