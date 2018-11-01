@@ -134,10 +134,6 @@ parameters:
     type: number
     description: Stack creation timeout (seconds)
     default: 900
-  dns_domain:
-    type: string
-    description: Management net domain
-    default: local.
 
 resources:
   # deploy_done: Wait condition to signal that the deploy node has completed its
@@ -202,7 +198,6 @@ resources:
     type: OS::Neutron::Net
     properties:
       name: management-net
-      dns_domain: { get_param: dns_domain }
 
   # management_sub_net: private Neutron subnet
   #
@@ -314,7 +309,6 @@ resources:
   deploy_management_port:
     type: OS::Neutron::Port
     properties:
-      dns_name: deploy
       network: { get_resource: management_net }
       security_groups:
         - { get_resource: server_security_group }
