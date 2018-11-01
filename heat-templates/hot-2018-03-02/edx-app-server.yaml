@@ -12,6 +12,12 @@ parameters:
   name:
     type: string
     description: Name of the server
+  index:
+    type: string
+    description: Index of the server
+  ip_map:
+    type: json
+    description: Map of IPs
   image:
     type: string
     description: >
@@ -127,6 +133,8 @@ resources:
       dns_name: { get_param: name }
       network: { get_param: network }
       security_groups: [ { get_param: security_group } ]
+      fixed_ips:
+        - ip_address: { get_param: [ ip_map, { get_param: index } ] }
 
   # http(s)_member: Octavia pool membership
   #
