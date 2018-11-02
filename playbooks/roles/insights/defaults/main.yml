@@ -220,5 +220,6 @@ insights_debian_pkgs:
 insights_release_specific_debian_pkgs:
   precise:
     - openjdk-7-jdk
+  trusty: []
   xenial:
     - openjdk-8-jdk

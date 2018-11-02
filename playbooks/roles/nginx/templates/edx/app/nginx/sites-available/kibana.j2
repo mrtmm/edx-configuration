@@ -42,6 +42,8 @@ server {
   }
   {% endif %}
 
+  include {{ nginx_include_dir }}/kibana-pre/*;
+
   # Execute the actual redirect
   if ($do_redirect_to_https = "true")
   {
@@ -93,4 +95,6 @@ server {
 		  break;
 	  }
   }
+
+  include {{ nginx_include_dir }}/kibana/*;
 }
