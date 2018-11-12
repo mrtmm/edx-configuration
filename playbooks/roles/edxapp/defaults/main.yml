@@ -661,6 +661,7 @@ EDXAPP_CELERY_WORKERS:
     concurrency: 1
     monitor: True
     prefetch_optimization: default
+    syslog: False
   - queue: high
     service_variant: cms
     concurrency: 1
@@ -671,15 +672,18 @@ EDXAPP_CELERY_WORKERS:
     concurrency: 1
     monitor: True
     prefetch_optimization: default
+    syslog: False
   - queue: high
     service_variant: lms
     concurrency: 1
     monitor: True
     prefetch_optimization: default
+    syslog: False
   - queue: high_mem
     service_variant: lms
     concurrency: 1
     monitor: False
+    syslog: False
     max_tasks_per_child: 1
     prefetch_optimization: default
 EDXAPP_RECALCULATE_GRADES_ROUTING_KEY: 'edx.lms.core.default'
