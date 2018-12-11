@@ -58,6 +58,26 @@
     - suspender
     - reaper
 
+- name: "Stop supervisor services"
+  shell:  "{{ supervisor_ctl }} -c {{ supervisor_cfg }} stop {{ item }}:"
+  with_items:
+    - suspender
+    - reaper
+  when: disable_edx_services
+  tags:
+    - manage
+
+- name: "Disable supervisor scripts"
+  file:
+    path: "{{ supervisor_cfg_dir }}/{{ item }}.conf"
+    state: absent
+  with_items:
+    - suspender
+    - reaper
+  when: disable_edx_services
+  tags:
+    - manage
+
 - name: "Enable supervisor scripts"
   file:
     src: "{{ supervisor_available_dir }}/{{ item }}.conf"
@@ -71,12 +91,15 @@
     - suspender
     - reaper
   when: not disable_edx_services
+  tags:
+    - manage
 
 - name: Update supervisor configuration
   shell:  "{{ supervisor_ctl }} -c {{ supervisor_cfg }} update"
   register: supervisor_update
   changed_when: supervisor_update.stdout is defined and supervisor_update.stdout != ""
-  when: not disable_edx_services
+  tags:
+    - manage
 
 - name: Restart supervisor services
   shell:  "{{ supervisor_ctl }} -c {{ supervisor_cfg }} restart {{ item }}:"
@@ -84,3 +107,5 @@
     - suspender
     - reaper
   when: not disable_edx_services
+  tags:
+    - manage
