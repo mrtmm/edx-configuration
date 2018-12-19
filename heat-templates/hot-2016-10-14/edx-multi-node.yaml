@@ -27,6 +27,12 @@ parameters:
       Image ID or name.
       Should be a distribution platform supported for Open edX.
     default: ubuntu-16.04-server-cloudimg
+  tmp_app_image:
+    type: string
+    description: >
+      Image ID or name.
+      Should be a distribution platform supported for Open edX.
+    default: ubuntu-16.04-server-cloudimg
   app_master_image:
     type: string
     description: >
@@ -64,7 +70,7 @@ parameters:
   app_master_ips:
     type: json
     default:
-      '0': 192.168.122.190
+      '0': 192.168.122.140
   app_flavor:
     type: string
     description: Flavor to use for app servers
@@ -73,6 +79,10 @@ parameters:
     type: number
     description: Number of app servers
     default: 1
+  tmp_app_count:
+    type: number
+    description: Number of new app servers
+    default: 0
   app_http_port:
     type: number
     description: Load balancer HTTP port for app servers
@@ -104,6 +114,29 @@ parameters:
       '17': 192.168.122.167
       '18': 192.168.122.168
       '19': 192.168.122.169
+  tmp_app_ips:
+    type: json
+    default:
+      '0': 192.168.122.180
+      '1': 192.168.122.181
+      '2': 192.168.122.182
+      '3': 192.168.122.183
+      '4': 192.168.122.184
+      '5': 192.168.122.185
+      '6': 192.168.122.186
+      '7': 192.168.122.187
+      '8': 192.168.122.188
+      '9': 192.168.122.189
+      '10': 192.168.122.190
+      '11': 192.168.122.191
+      '12': 192.168.122.192
+      '13': 192.168.122.193
+      '14': 192.168.122.194
+      '15': 192.168.122.195
+      '16': 192.168.122.196
+      '17': 192.168.122.197
+      '18': 192.168.122.198
+      '19': 192.168.122.199
   public_net_id:
     type: string
     description: Public network ID
@@ -300,6 +333,7 @@ resources:
         backend_count: { get_param: backend_count }
         app_master_count: { get_param: app_master_count }
         app_count: { get_param: app_count }
+        tmp_app_count: { get_param: tmp_app_count }
 
   # deploy_management_port: the deploy node's network port in the
   # management network
@@ -385,6 +419,31 @@ resources:
           ip_map: { get_param: app_ips }
           flavor: { get_param: app_flavor }
           image: { get_param: app_image }
+          key_name: { get_param: key_name }
+          http_pool: { get_resource: app_server_http_pool }
+          http_port: { get_param: app_http_port }
+          https_pool: { get_resource: app_server_https_pool }
+          https_port: { get_param: app_https_port }
+          metadata: { "metering.stack": { get_param: "OS::stack_id" } }
+          network: { get_resource: management_net }
+          subnet: { get_resource: management_sub_net }
+          security_group: { get_resource: server_security_group }
+
+  # tmp_app_servers: roll out new app servers while the old ones
+  # still exist, for a poor man's rolling update
+  tmp_app_servers:
+    type: OS::Heat::ResourceGroup
+    depends_on: management_sub_net
+    properties:
+      count: { get_param: tmp_app_count }
+      resource_def:
+        type: edx-app-server.yaml
+        properties:
+          name: tmpapp%index%
+          index: '%index%'
+          ip_map: { get_param: tmp_app_ips }
+          flavor: { get_param: app_flavor }
+          image: { get_param: tmp_app_image }
           key_name: { get_param: key_name }
           http_pool: { get_resource: app_server_http_pool }
           http_port: { get_param: app_http_port }
