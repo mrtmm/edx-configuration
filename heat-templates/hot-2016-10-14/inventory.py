@@ -16,6 +16,7 @@ class OpenStackEdxInventory(object):
     metadata_url = "http://169.254.169.254/openstack/latest/meta_data.json"
     groups = {
         "app_servers": {"field": "app_count", "basename": "app"},
+        "tmp_app_servers": {"field": "tmp_app_count", "basename": "tmpapp"},
         "backend_servers": {"field": "backend_count", "basename": "backend"},
         "app_master": {"field": "app_master_count", "basename": "appmaster"}
     }
