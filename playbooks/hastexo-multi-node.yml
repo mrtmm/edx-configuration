@@ -33,7 +33,7 @@
     - rabbitmq
 
 - name: Configure app servers
-  hosts: app_servers:app_master
+  hosts: app_servers:tmp_app_servers:app_master
   become: True
   gather_facts: True
   roles:
