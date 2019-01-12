@@ -39,6 +39,15 @@
     - install
     - install:code
 
+- name: ensure ssh directory exists
+  file:
+    path: "{{ git_home }}/.ssh"
+    state: directory
+    owner: "{{ repo_owner }}"
+    group: "{{ repo_group }}"
+  tags:
+    - install
+    - install:code
 
 - name: Install read-only ssh key
   copy:

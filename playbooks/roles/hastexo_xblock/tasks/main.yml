@@ -8,28 +8,27 @@
     - tomcat8
     - maven
 
-- name: Checkout repository
-  git:
-    repo: "{{ hastexo_xblock_repo }}"
-    version: "v{{ hastexo_xblock_version }}"
-    dest: /tmp/hastexo-xblock
-
 - name: Configure CORS
   template:
     src: web.xml.j2
-    dest: /tmp/hastexo-xblock/guacamole/src/main/webapp/WEB-INF/web.xml
+    dest: "{{ hastexo_xblock_git_checkout }}/guacamole/src/main/webapp/WEB-INF/web.xml"
   when: NGINX_REDIRECT_TO_HTTPS and not devstack
 
 - name: Build package
   command: mvn package
   args:
-    chdir: /tmp/hastexo-xblock/guacamole
+    chdir: "{{ hastexo_xblock_git_checkout }}/guacamole"
 
 - name: Copy war file
   copy:
     remote_src: yes
-    src: /tmp/hastexo-xblock/guacamole/target/hastexo-xblock-{{ hastexo_xblock_version }}.war
+    src: "{{ hastexo_xblock_git_checkout }}/guacamole/target/hastexo-xblock-{{ hastexo_xblock_version }}.war"
     dest: /var/lib/tomcat8/webapps/hastexo-xblock.war
+
+- name: Remote checkout
+  file:
+    path: "{{ hastexo_xblock_git_checkout }}"
+    state: absent
 
 - name: Restart tomcat8
   systemd:
