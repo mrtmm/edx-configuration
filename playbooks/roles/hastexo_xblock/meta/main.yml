@@ -2,3 +2,8 @@
 dependencies:
   - common_vars
   - supervisor
+  - role: git_clone
+    repo_owner: "{{ hastexo_xblock_git_user }}"
+    repo_group: "{{ hastexo_xblock_git_group }}"
+    GIT_REPOS: "{{ hastexo_xblock_git_repos }}"
+    git_home: "{{ hastexo_xblock_git_home }}"
