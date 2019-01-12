@@ -9,3 +9,4 @@ startup_message off
 shell -$SHELL
 shelltitle '] |_'
 caption splitonly "%2n %t"
+defscrollback 10240
