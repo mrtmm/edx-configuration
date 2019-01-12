@@ -1,5 +1,25 @@
 ---
 hastexo_xblock_version: 2.0.0a
-hastexo_xblock_repo: https://github.com/hastexo/hastexo-xblock.git
 hastexo_xblock_url: /hastexo-xblock
 hastexo_xblock_port: 8080
+hastexo_xblock_git_protocol: "https"
+hastexo_xblock_git_mirror: "{{ COMMON_GIT_MIRROR }}"
+hastexo_xblock_git_path: "hastexo"
+hastexo_xblock_git_repo: hastexo-xblock.git
+hastexo_xblock_git_user: "www-data"
+hastexo_xblock_git_group: "www-data"
+hastexo_xblock_git_home: "{{ COMMON_DATA_DIR }}/hastexo-xblock"
+hastexo_xblock_git_checkout: "{{ hastexo_xblock_git_home }}/hastexo-xblock"
+hastexo_xblock_git_identity: !!null
+hastexo_xblock_git_tag: "v{{ hastexo_xblock_version }}"
+
+hastexo_xblock_git_repos:
+  - PROTOCOL: "{{ hastexo_xblock_git_protocol }}"
+    DOMAIN: "{{ hastexo_xblock_git_mirror }}"
+    PATH: "{{ hastexo_xblock_git_path }}"
+    REPO: "{{ hastexo_xblock_git_repo }}"
+    VERSION: "{{ hastexo_xblock_git_tag }}"
+    DESTINATION: "{{ hastexo_xblock_git_checkout }}"
+    SSH_KEY: "{{ hastexo_xblock_git_identity }}"
+
+hastexo_xblock_pip_repo: "git+{{ hastexo_xblock_git_protocol }}://{{ hastexo_xblock_git_mirror }}/{{ hastexo_xblock_git_path }}/{{ hastexo_xblock_git_repo }}"
