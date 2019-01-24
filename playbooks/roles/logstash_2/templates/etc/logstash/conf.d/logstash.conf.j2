@@ -37,6 +37,39 @@ filter {
     mutate {
       remove_field => [ "syslog_hostname", "syslog_message", "syslog_timestamp" ]
     }
+    grok {
+      match => {
+        "message" => [
+          "Fired async launch task \[%{UUID:celery_task_id}\] for \[%{DATA:stack_name}\]",
+          "LaunchStackTask\[%{UUID:celery_task_id}\].*Trying to launch stack \[%{DATA:stack_name}\] on provider \[%{DATA:provider}\]",
+          "LaunchStackTask\[%{UUID:celery_task_id}\].*succeeded in %{BASE10NUM:celery_task_duration}s: {'status': u?'%{DATA:stack_status}'",
+          "LaunchStackTask\[%{UUID:celery_task_id}\]"
+        ]
+      }
+    }
+    if "Fired async launch task" in [message] {
+      aggregate {
+        task_id => "%{celery_task_id}"
+        code => "map['stack_name'] = event['stack_name']; map['provider'] = 'none'"
+        map_action => "create"
+      }
+    }
+    if "on provider" in [message] {
+      aggregate {
+        task_id => "%{celery_task_id}"
+        code => "map['provider'] = event['provider']"
+        map_action => "update"
+      }
+    }
+    if [syslog_facility_code] == 1 and [message] =~ "LaunchStackTask.*succeeded in" {
+      aggregate {
+        task_id => "%{celery_task_id}"
+        code => "event['stack_name'] = map['stack_name']; event['provider'] = map['provider']"
+        map_action => "update"
+        end_of_task => true
+        timeout => 3600
+      }
+    }
   }
 }
 
