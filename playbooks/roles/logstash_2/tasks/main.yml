@@ -26,9 +26,20 @@
     - install
     - install:base
 
+- name: Install aggregate plugin
+  shell: bin/plugin install logstash-filter-aggregate
+  args:
+    chdir: /opt/logstash
+  become: True
+  become_user: logstash
+  notify: restart logstash
+  tags:
+    - install
+    - install:configuration
+
 - name: drop the logstash config
   template:
-    src: etc/logstash/conf.d/logstash.conf.j2 
+    src: etc/logstash/conf.d/logstash.conf.j2
     dest: /etc/logstash/conf.d/logstash.conf
     mode: 0644
   notify: restart logstash
