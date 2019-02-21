@@ -327,6 +327,7 @@ resources:
       key_name: { get_param: key_name }
       user_data: { get_resource: deploy_cloud_config }
       user_data_format: RAW
+      user_data_update_policy: IGNORE
       networks:
         - port: { get_resource: deploy_management_port }
       metadata:

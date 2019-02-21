@@ -128,6 +128,7 @@ resources:
       metadata: { get_param: metadata }
       user_data: { get_resource: server_cloud_config }
       user_data_format: RAW
+      user_data_update_policy: IGNORE
       networks: [ { port: { get_resource: server_port } } ]
       scheduler_hints:
         group: { get_param: server_group }
