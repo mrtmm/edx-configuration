@@ -110,6 +110,7 @@ resources:
       key_name: { get_param: key_name }
       user_data: { get_resource: edx_cloud_config }
       user_data_format: RAW
+      user_data_update_policy: IGNORE
       networks:
         - port: { get_resource: edx_management_port }
 
