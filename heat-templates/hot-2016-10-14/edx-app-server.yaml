@@ -49,6 +49,9 @@ parameters:
   security_group:
     type: string
     description: Security group used by the server
+  server_group:
+    type: string
+    description: Server group used by the server
   key_name:
     type: string
     description: >
@@ -126,6 +129,8 @@ resources:
       user_data: { get_resource: server_cloud_config }
       user_data_format: RAW
       networks: [ { port: { get_resource: server_port } } ]
+      scheduler_hints:
+        group: { get_param: server_group }
 
   server_port:
     type: OS::Neutron::Port

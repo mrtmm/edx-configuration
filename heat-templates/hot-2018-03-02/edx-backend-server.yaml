@@ -36,6 +36,9 @@ parameters:
   security_group:
     type: string
     description: Security group used by the server
+  server_group:
+    type: string
+    description: Server group used by the server
   key_name:
     type: string
     description: >
@@ -142,6 +145,8 @@ resources:
       user_data_format: RAW
       networks:
         - port: { get_resource: management_port }
+      scheduler_hints:
+        group: { get_param: server_group }
       block_device_mapping:
         - "device_name": "vdb"
           "volume_id": { get_resource: mysql_data }

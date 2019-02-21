@@ -358,6 +358,16 @@ resources:
       floating_network_id: { get_param: public_net_id }
       port_id: { get_resource: deploy_management_port }
 
+  # backend_server_group: a server group for backend servers
+  #
+  # Set a hard anti-affinity policy, to minimize the effect of compute node
+  # failures on the functioning of the cluster.
+  backend_server_group:
+    type: OS::Nova::ServerGroup
+    properties:
+      name: backend_server_group
+      policies: ["anti-affinity"]
+
   # backend_servers: creates a backend cluster of nodes
   #
   # Backend servers are named backend0 ... backendN, where N == backend_count - 1.
@@ -378,6 +388,7 @@ resources:
           metadata: { "metering.stack": { get_param: "OS::stack_id" } }
           network: { get_resource: management_net }
           security_group: { get_resource: server_security_group }
+          server_group: { get_resource: backend_server_group }
           mysql_size: { get_param: mysql_size }
           mongodb_size: { get_param: mongodb_size }
           volume_deletion_policy: { get_param: volume_deletion_policy }
@@ -401,6 +412,16 @@ resources:
           key_name: { get_param: key_name }
           network: { get_resource: management_net }
           security_group: { get_resource: server_security_group }
+
+  # app_server_group: a server group for app servers
+  #
+  # Set a soft anti-affinity policy, to minimize the effect of compute node
+  # failures on the functioning of the cluster.
+  app_server_group:
+    type: OS::Nova::ServerGroup
+    properties:
+      name: app_server_group
+      policies: ["soft-anti-affinity"]
 
   # app_servers: creates an application server cluster of a
   # configurable size
@@ -428,6 +449,7 @@ resources:
           network: { get_resource: management_net }
           subnet: { get_resource: management_sub_net }
           security_group: { get_resource: server_security_group }
+          server_group: { get_resource: app_server_group }
 
   # tmp_app_servers: roll out new app servers while the old ones
   # still exist, for a poor man's rolling update
@@ -453,6 +475,7 @@ resources:
           network: { get_resource: management_net }
           subnet: { get_resource: management_sub_net }
           security_group: { get_resource: server_security_group }
+          server_group: { get_resource: app_server_group }
 
   # app_server_lb: Neutron LBaaS v2 load balancer
   app_server_lb:
