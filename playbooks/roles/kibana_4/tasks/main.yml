@@ -38,7 +38,10 @@
     - install:configuration
 
 - name: Start kibana
-  service: name=kibana state=started
+  service:
+    name: kibana
+    state: started
+    enabled: yes
 
 - name: Create htpasswd file
   htpasswd:
