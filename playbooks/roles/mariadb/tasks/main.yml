@@ -131,3 +131,17 @@
     priv: "*.*:CREATE USER"
     host: "{{ MARIADB_HOST_PRIV }}"
   run_once: true
+
+- command: mysql -NBe "SELECT COUNT(*) FROM mysql.time_zone"
+  register: tzcount
+  changed_when: false
+  run_once: true
+  tags:
+    - tzinfo
+
+- name: import timezone data
+  shell: "mysql_tzinfo_to_sql /usr/share/zoneinfo | mysql mysql"
+  when: tzcount.stdout|int < 1
+  run_once: true
+  tags:
+    - tzinfo
