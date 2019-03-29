@@ -26,7 +26,6 @@
   roles:
     - common
     - vhost
-    - mysql
     - edxlocal
     - memcache
     - mongo_3_2
