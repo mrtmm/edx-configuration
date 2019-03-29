@@ -160,12 +160,12 @@ node, go back to your installed node and:
             os_region_name: ""
     ```
 
-2. Check out the `hastexo/integration/hawthorn/master` branch of edx-configuration, which
+2. Check out the `hastexo/integration/ironwood/master` branch of edx-configuration, which
    contains the `hastexo_xblock` role:
 
     ```
     $ cd /var/tmp/edx-configuration
-    $ git checkout hastexo/integration/hawthorn/master
+    $ git checkout hastexo/integration/ironwood/master
     ```
 
 3. Add the `hastexo_xblock` role to `openstack-single-node.yml` and rerun that
@@ -222,14 +222,14 @@ openstack stack output show $stack deploy_ip
 ssh ubuntu@<deploy_ip> -A
 ```
 
-Before you continue, you'll need the `hastexo/integration/hawthorn/master` fork of
+Before you continue, you'll need the `hastexo/integration/ironwood/master` fork of
 `edx-configuration`.  Clone it, and then enable the sample group and host
 variables, which will configure this deployment of Open edX.  Due to how
 Ansible variable precedence works, it is recommended that you copy the sample
 ones to a separate directory:
 
 ```
-git clone https://github.com/hastexo/edx-configuration.git -b hastexo/integration/hawthorn/master
+git clone https://github.com/hastexo/edx-configuration.git -b hastexo/integration/ironwood/master
 cp -a edx-configuration/playbooks/openstack edx-configuration-secrets
 cd edx-configuration-secrets/group_vars
 for i in *.example; do cp $i ${i%.example}; done
@@ -237,24 +237,16 @@ cd ../host_vars
 for i in 192*.example; do cp $i ${i%.example}; done
 ```
 
-It is recommended that you use the hastexo edX repositories, and in particular
-the `hastexo/integration/hawthorn/master` branch of `edx-platform`.  These are known to
-work correctly in an OpenStack cluster.  To do so, edit
+It is recommended that you use the hastexo edx-platform repository, in the
+`hastexo/integration/ironwood/master` branch.  It is tested to work correctly
+in an OpenStack cluster with the hastexo-xblock.  To do so, edit
 `edx-configuration-secrets/group_vars/all`, and replace the repository
 variables with the following:
 
 ```
 # Repos
 edx_platform_repo: "https://{{ COMMON_GIT_MIRROR }}/hastexo/edx-platform.git"
-edx_platform_version: "hastexo/integration/hawthorn/master"
-CERTS_REPO: "https://{{ COMMON_GIT_MIRROR }}/hastexo/edx-certificates.git"
-certs_version: "master"
-forum_source_repo: "https://{{ COMMON_GIT_MIRROR }}/hastexo/edx-forum.git"
-forum_version: "master"
-xqueue_source_repo: "https://{{ COMMON_GIT_MIRROR }}/hastexo/edx-xqueue.git"
-xqueue_version: "hastexo/integration/hawthorn/master"
-NOTIFIER_SOURCE_REPO: "https://{{ COMMON_GIT_MIRROR }}/hastexo/edx-notifier.git"
-NOTIFIER_VERSION: "master"
+edx_platform_version: "hastexo/integration/ironwood/master"
 ```
 
 At this point, make sure to create a Swift container for this deployment: it'll
