@@ -42,6 +42,7 @@ filter {
         "message" => [
           "Fired async launch task \[%{UUID:celery_task_id}\] for \[%{DATA:stack_name}\]",
           "LaunchStackTask\[%{UUID:celery_task_id}\].*Trying to launch stack \[%{DATA:stack_name}\] on provider \[%{DATA:provider}\]",
+          "LaunchStackTask\[%{UUID:celery_task_id}\].*Resetting stack \[%{DATA:stack_name}\] on provider \[%{DATA:provider}\]",
           "LaunchStackTask\[%{UUID:celery_task_id}\].*succeeded in %{BASE10NUM:celery_task_duration}s: {'status': u?'%{DATA:stack_status}'",
           "LaunchStackTask\[%{UUID:celery_task_id}\]"
         ]
