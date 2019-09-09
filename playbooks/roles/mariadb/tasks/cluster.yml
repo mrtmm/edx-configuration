@@ -4,7 +4,7 @@
     dest: "/etc/mysql/conf.d/galera.cnf"
     owner: "root"
     group: "root"
-    mode: 0600
+    mode: 0644
 
 - name: check if we have already bootstrapped the cluster
   stat: path=/etc/mysql/ansible_cluster_started
@@ -32,20 +32,12 @@
 
 - name: copy fetched file to other cluster members
   copy: src=/tmp/debian.cnf dest=/etc/mysql/debian.cnf
-  when: mariadb_new_debian_cnf is defined  
+  when: mariadb_new_debian_cnf is defined
 
 - name: start everything
   service: name=mysql state=started
   when: not mariadb_bootstrap.stat.exists
-
-- name: reset galera cluster config since we are bootstrapped
-  template:
-    src: "etc/mysql/conf.d/galera.cnf.j2"
-    dest: "/etc/mysql/conf.d/galera.cnf"
-    owner: "root"
-    group: "root"
-    mode: 0600
-  when: not mariadb_bootstrap.stat.exists
+  ignore_errors: true
 
 - name: touch bootstrap file to confirm we are fully up
   file: path="/etc/mysql/ansible_cluster_started" state=touch
@@ -60,3 +52,4 @@
     priv: "*.*:USAGE,RELOAD"
     state: present
   with_items: MARIADB_HAPROXY_HOSTS
+  run_once: true

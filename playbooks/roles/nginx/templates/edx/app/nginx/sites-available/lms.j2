@@ -291,4 +291,5 @@ location ~ ^{{ EDXAPP_MEDIA_URL }}/(?P<file>.*) {
   {% include "static-files.j2" %}
   {% include "extra_locations_lms.j2" ignore missing %}
 
+  include {{ nginx_include_dir }}/lms/*;
 }
