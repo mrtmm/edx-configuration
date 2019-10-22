@@ -37,7 +37,6 @@
   become: True
   gather_facts: True
   roles:
-    - openstack
     - supervisor
     - role: nginx
       nginx_sites:
