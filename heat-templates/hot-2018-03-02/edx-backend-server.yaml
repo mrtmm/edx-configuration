@@ -58,13 +58,30 @@ parameters:
       Deletion policy for the volumes.  One of 'Delete', 'Retain', or
       'Snapshot'.
     default: Retain
-  galera_vip:
-    type: string
-    description: Load-balanced virtual IP for MySQL/Galera
-    default: 192.168.122.110/32
   wait_condition_callback:
     type: string
     description: Command to execute at end of initialization
+  galera_pool:
+    type: string
+    description: LBaaS Galera pool
+  galera_port:
+    type: number
+    description: Galera port number
+  rabbitmq_pool:
+    type: string
+    description: LBaaS RabbitMQ pool
+  rabbitmq_port:
+    type: number
+    description: RabbitMQ port number
+  elasticsearch_pool:
+    type: string
+    description: LBaaS ElasticSearch pool
+  elasticsearch_port:
+    type: number
+    description: ElasticSearch port number
+  subnet:
+    type: string
+    description: Subnet on which the load balancer will be located
 
 resources:
   # common_config_part: cloud-init configuration common to all nodes
@@ -167,10 +184,33 @@ resources:
       network: { get_param: network }
       security_groups:
         - { get_param: security_group }
-      allowed_address_pairs:
-        - ip_address: { get_param: galera_vip }
       fixed_ips:
         - ip_address: { get_param: [ ip_map, { get_param: index } ] }
+
+  # Load-balancer pool memberships
+  galera_member:
+    type: OS::Octavia::PoolMember
+    properties:
+      address: { get_attr: [ server, first_address ] }
+      pool: { get_param: galera_pool }
+      protocol_port: { get_param: galera_port }
+      subnet: { get_param: subnet }
+
+  rabbitmq_member:
+    type: OS::Octavia::PoolMember
+    properties:
+      address: { get_attr: [ server, first_address ] }
+      pool: { get_param: rabbitmq_pool }
+      protocol_port: { get_param: rabbitmq_port }
+      subnet: { get_param: subnet }
+
+  elasticsearch_member:
+    type: OS::Octavia::PoolMember
+    properties:
+      address: { get_attr: [ server, first_address ] }
+      pool: { get_param: elasticsearch_pool }
+      protocol_port: { get_param: elasticsearch_port }
+      subnet: { get_param: subnet }
 
   # mysql_data: persistent storage volume for MySQL/MariaDB data
   mysql_data:
