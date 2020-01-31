@@ -1,13 +1,6 @@
 ---
 # Example multi-node OpenStack deployment.
 
-- name: Configure keepalived
-  hosts: backend_servers
-  become: True
-  gather_facts: True
-  roles:
-    - keepalived
-
 - name: Configure backend servers
   hosts: backend_servers
   become: True

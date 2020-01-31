@@ -11,9 +11,8 @@ certs_version: "open-release/ginkgo.2"
 forum_version: "open-release/ginkgo.2"
 NOTIFIER_VERSION: "open-release/ginkgo.2"
 
-# Keepalived
-keepalived_shared_ip: "192.168.122.110"
-keepalived_shared_iface: "ens3"
+# Backend load balancer IP
+backend_vip: "192.168.122.110"
 
 # Mongo
 MONGO_CLUSTER_KEY: 'password'
@@ -351,7 +350,7 @@ NOTIFIER_DATABASE_NAME: "notifier"
 NOTIFIER_DATABASE_ENGINE: "django.db.backends.mysql"
 NOTIFIER_DATABASE_USER: "notifier"
 NOTIFIER_DATABASE_PASSWORD: "password"
-NOTIFIER_DATABASE_HOST: "{{ keepalived_shared_ip }}"
+NOTIFIER_DATABASE_HOST: "{{ backend_vip }}"
 NOTIFIER_DATABASE_PORT: 3306
 NOTIFIER_DIGEST_EMAIL_SENDER: "notifications@example.com"
 NOTIFIER_LMS_URL_BASE: "http://localhost:8000"

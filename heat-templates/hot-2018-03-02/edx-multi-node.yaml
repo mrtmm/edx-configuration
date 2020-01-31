@@ -57,6 +57,22 @@ parameters:
       '0': 192.168.122.111
       '1': 192.168.122.112
       '2': 192.168.122.113
+  backend_vip:
+    type: string
+    description: Load-balanced virtual IP for the backends
+    default: 192.168.122.110
+  backend_galera_port:
+    type: number
+    description: Load balancer Galera port for backend servers
+    default: 3306
+  backend_rabbitmq_port:
+    type: number
+    description: Load balancer RabbitMQ port for backend servers
+    default: 5672
+  backend_elasticsearch_port:
+    type: number
+    description: Load balancer ElasticSearch port for backend servers
+    default: 9200
   app_master_flavor:
     type: string
     description: Flavor to use for the app master server
@@ -159,10 +175,6 @@ parameters:
       Deletion policy for the volumes.  One of 'Delete', 'Retain', or
       'Snapshot'.
     default: Retain
-  galera_vip:
-    type: string
-    description: Load-balanced virtual IP for MySQL/Galera
-    default: 192.168.122.110
   timeout:
     type: number
     description: Stack creation timeout (seconds)
@@ -208,6 +220,21 @@ resources:
       rules:
       - remote_mode: 'remote_group_id'
         direction: ingress
+      - remote_ip_prefix: 192.168.122.0/24
+        protocol: tcp
+        direction: ingress
+        port_range_min: { get_param: backend_galera_port }
+        port_range_max: { get_param: backend_galera_port }
+      - remote_ip_prefix: 192.168.122.0/24
+        protocol: tcp
+        direction: ingress
+        port_range_min: { get_param: backend_rabbitmq_port }
+        port_range_max: { get_param: backend_rabbitmq_port }
+      - remote_ip_prefix: 192.168.122.0/24
+        protocol: tcp
+        direction: ingress
+        port_range_min: { get_param: backend_elasticsearch_port }
+        port_range_max: { get_param: backend_elasticsearch_port }
       - remote_ip_prefix: 0.0.0.0/0
         protocol: tcp
         direction: ingress
@@ -393,8 +420,90 @@ resources:
           mysql_size: { get_param: mysql_size }
           mongodb_size: { get_param: mongodb_size }
           volume_deletion_policy: { get_param: volume_deletion_policy }
-          galera_vip: { get_param: galera_vip }
           wait_condition_callback: { get_attr: ['backend_done_handle', 'curl_cli'] }
+          galera_pool: { get_resource: backend_galera_pool }
+          galera_port: { get_param: backend_galera_port }
+          rabbitmq_pool: { get_resource: backend_rabbitmq_pool }
+          rabbitmq_port: { get_param: backend_rabbitmq_port }
+          elasticsearch_pool: { get_resource: backend_elasticsearch_pool }
+          elasticsearch_port: { get_param: backend_elasticsearch_port }
+          subnet: { get_resource: management_sub_net }
+
+  # backend_server_lb: Octavia load balancer for the backend servers
+  backend_lb:
+    type: OS::Octavia::LoadBalancer
+    properties:
+      vip_subnet: { get_resource: management_sub_net }
+      vip_address: { get_param: backend_vip }
+
+  backend_galera_listener:
+    type: OS::Octavia::Listener
+    properties:
+      loadbalancer: { get_resource: backend_lb }
+      protocol: TCP
+      protocol_port: { get_param: backend_galera_port }
+
+  backend_rabbitmq_listener:
+    type: OS::Octavia::Listener
+    properties:
+      loadbalancer: { get_resource: backend_lb }
+      protocol: TCP
+      protocol_port: { get_param: backend_rabbitmq_port }
+
+  backend_elasticsearch_listener:
+    type: OS::Octavia::Listener
+    properties:
+      loadbalancer: { get_resource: backend_lb }
+      protocol: TCP
+      protocol_port: { get_param: backend_elasticsearch_port }
+
+  backend_galera_pool:
+    type: OS::Octavia::Pool
+    properties:
+      lb_algorithm: LEAST_CONNECTIONS
+      listener: { get_resource: backend_galera_listener }
+      protocol: TCP
+
+  backend_rabbitmq_pool:
+    type: OS::Octavia::Pool
+    properties:
+      lb_algorithm: LEAST_CONNECTIONS
+      listener: { get_resource: backend_rabbitmq_listener }
+      protocol: TCP
+
+  backend_elasticsearch_pool:
+    type: OS::Octavia::Pool
+    properties:
+      lb_algorithm: LEAST_CONNECTIONS
+      listener: { get_resource: backend_elasticsearch_listener }
+      protocol: TCP
+
+  backend_galera_monitor:
+    type: OS::Octavia::HealthMonitor
+    properties:
+      type: TCP
+      delay: 5
+      max_retries: 5
+      pool: { get_resource: backend_galera_pool }
+      timeout: 5
+
+  backend_rabbitmq_monitor:
+    type: OS::Octavia::HealthMonitor
+    properties:
+      type: TCP
+      delay: 5
+      max_retries: 5
+      pool: { get_resource: backend_rabbitmq_pool }
+      timeout: 5
+
+  backend_elasticsearch_monitor:
+    type: OS::Octavia::HealthMonitor
+    properties:
+      type: TCP
+      delay: 5
+      max_retries: 5
+      pool: { get_resource: backend_elasticsearch_pool }
+      timeout: 5
 
   # app_master_servers: conditionally create application master servers
   app_master_servers:
