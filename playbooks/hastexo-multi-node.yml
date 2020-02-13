@@ -40,8 +40,6 @@
     - role: edxapp
       celery_worker: True
     - edxapp
-    - role: notifier
-      NOTIFIER_DIGEST_TASK_INTERVAL: "5"
     - role: postfix
       when: POSTFIX_QUEUE_EXTERNAL_SMTP_HOST is not defined or POSTFIX_QUEUE_EXTERNAL_SMTP_HOST == ''
     - role: postfix_queue
