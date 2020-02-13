@@ -36,7 +36,6 @@
       - cms
       - lms
       - forum
-      - xqueue
       nginx_default_sites:
       - lms
     - role: edxapp
@@ -45,8 +44,6 @@
     - forum
     - role: notifier
       NOTIFIER_DIGEST_TASK_INTERVAL: "5"
-    - role: xqueue
-      update_users: True
     - role: postfix
       when: POSTFIX_QUEUE_EXTERNAL_SMTP_HOST is not defined or POSTFIX_QUEUE_EXTERNAL_SMTP_HOST == ''
     - role: postfix_queue
