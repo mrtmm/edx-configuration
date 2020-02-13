@@ -35,13 +35,11 @@
       nginx_sites:
       - cms
       - lms
-      - forum
       nginx_default_sites:
       - lms
     - role: edxapp
       celery_worker: True
     - edxapp
-    - forum
     - role: notifier
       NOTIFIER_DIGEST_TASK_INTERVAL: "5"
     - role: postfix
