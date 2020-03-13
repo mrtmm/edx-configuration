@@ -21,6 +21,8 @@
   }
      {% endif %}
 
+  include {{ nginx_include_dir }}/lms-pre/*;
+
   # Execute the actual redirect
   if ($do_redirect_to_https = "true")
   {

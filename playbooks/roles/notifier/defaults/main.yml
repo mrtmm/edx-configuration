@@ -130,3 +130,9 @@ notifier_env_vars:
   FORUM_DIGEST_TASK_RATE_LIMIT: "{{ NOTIFIER_FORUM_DIGEST_TASK_RATE_LIMIT }}"
   DEAD_MANS_SNITCH_URL: "{{ NOTIFIER_DEAD_MANS_SNITCH_URL }}"
   BOTO_CONFIG: "{{ notifier_app_dir }}/.boto"
+
+notifier_migration_env_default:
+  NOTIFIER_DATABASE_USER: "{{ COMMON_MYSQL_MIGRATE_USER }}"
+  NOTIFIER_DATABASE_PASSWORD: "{{ COMMON_MYSQL_MIGRATE_PASS }}"
+
+notifier_migration_env_vars: '{{ notifier_env_vars|combine(notifier_migration_env_default) }}'

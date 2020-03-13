@@ -1,0 +1,81 @@
+input {
+  udp {
+    host => "127.0.0.1"
+    port => {{ LOGSTASH_SYSLOG_PORT }}
+    type => "syslog"
+  }
+  tcp {
+    host => "127.0.0.1"
+    port => {{ LOGSTASH_SYSLOG_PORT }}
+    type => "syslog"
+  }
+}
+
+filter {
+  if [type] == "syslog" {
+    grok {
+      match => { "message" => "<%{POSINT:syslog_pri}>%{SYSLOGTIMESTAMP:syslog_timestamp} %{SYSLOGHOST:syslog_hostname} %{GREEDYDATA:syslog_message}" }
+      add_field => [ "received_at", "%{@timestamp}" ]
+      add_field => [ "received_from", "%{host}" ]
+    }
+    syslog_pri { }
+    date {
+      match => [ "syslog_timestamp", "MMM  d HH:mm:ss", "MMM dd HH:mm:ss" ]
+    }
+    if [syslog_pri] == "142" {
+      json {
+        source => "syslog_message"
+        target => "tracking"
+      }
+    }
+    if !("_grokparsefailure" in [tags]) {
+      mutate {
+        replace => [ "@source_host", "%{syslog_hostname}" ]
+        replace => [ "@message", "%{syslog_message}" ]
+      }
+    }
+    mutate {
+      remove_field => [ "syslog_hostname", "syslog_message", "syslog_timestamp" ]
+    }
+    grok {
+      match => {
+        "message" => [
+          "Fired async launch task \[%{UUID:celery_task_id}\] for \[%{DATA:stack_name}\]",
+          "LaunchStackTask\[%{UUID:celery_task_id}\].*Trying to launch stack \[%{DATA:stack_name}\] on provider \[%{DATA:provider}\]",
+          "LaunchStackTask\[%{UUID:celery_task_id}\].*Resetting stack \[%{DATA:stack_name}\] on provider \[%{DATA:provider}\]",
+          "LaunchStackTask\[%{UUID:celery_task_id}\].*succeeded in %{BASE10NUM:celery_task_duration}s: {'status': u?'%{DATA:stack_status}'",
+          "LaunchStackTask\[%{UUID:celery_task_id}\]"
+        ]
+      }
+    }
+    if "Fired async launch task" in [message] {
+      aggregate {
+        task_id => "%{celery_task_id}"
+        code => "map['stack_name'] = event['stack_name']; map['provider'] = 'none'"
+        map_action => "create"
+      }
+    }
+    if "on provider" in [message] {
+      aggregate {
+        task_id => "%{celery_task_id}"
+        code => "map['provider'] = event['provider']"
+        map_action => "update"
+      }
+    }
+    if [syslog_facility_code] == 1 and [message] =~ "LaunchStackTask.*succeeded in" {
+      aggregate {
+        task_id => "%{celery_task_id}"
+        code => "event['stack_name'] = map['stack_name']; event['provider'] = map['provider']"
+        map_action => "update"
+        end_of_task => true
+        timeout => 3600
+      }
+    }
+  }
+}
+
+output {
+  elasticsearch {
+    hosts => ["{{ LOGSTASH_ELASTICSEARCH_HOST }}"]
+  }
+}
