@@ -19,28 +19,28 @@
 
 - name: Get server tarball
   get_url:
-    url: "{{ guacd_mirror }}/guacamole/{{ guacd_version }}-incubating/source/guacamole-server-{{ guacd_version }}-incubating.tar.gz"
+    url: "{{ guacd_mirror }}/guacamole/{{ guacd_version }}/source/guacamole-server-{{ guacd_version }}.tar.gz"
     dest: /tmp
 
 - name: Extract server tarball
   unarchive:
     remote_src: yes
-    src: /tmp/guacamole-server-{{ guacd_version }}-incubating.tar.gz
+    src: /tmp/guacamole-server-{{ guacd_version }}.tar.gz
     dest: /tmp
 
 - name: Configure server
   command: ./configure --with-init-dir=/etc/init.d
   args:
-    chdir: /tmp/guacamole-server-{{ guacd_version }}-incubating
+    chdir: /tmp/guacamole-server-{{ guacd_version }}
 
 - name: Compile server
   make:
-    chdir: /tmp/guacamole-server-{{ guacd_version }}-incubating
+    chdir: /tmp/guacamole-server-{{ guacd_version }}
 
 - name: Install server
   make:
     target: install
-    chdir: /tmp/guacamole-server-{{ guacd_version }}-incubating
+    chdir: /tmp/guacamole-server-{{ guacd_version }}
 
 - name: Symlink freerdp libraries
   file:
