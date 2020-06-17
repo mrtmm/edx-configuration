@@ -1,0 +1,32 @@
+---
+# Mysql
+EDXAPP_MYSQL_HOST: "{{ backend_vip }}"
+XQUEUE_MYSQL_HOST: "{{ backend_vip }}"
+EDX_NOTES_API_MYSQL_HOST: "{{ backend_vip }}"
+CREDENTIALS_MYSQL_HOST: "{{ backend_vip }}"
+DISCOVERY_MYSQL: "{{ backend_vip }}"
+
+# Mongo
+EDXAPP_MONGO_HOSTS: "{{ groups['backend_servers'] }}"
+FORUM_MONGO_HOSTS: "{{ groups['backend_servers'] }}"
+
+# RabbitMQ
+EDXAPP_RABBIT_HOSTNAME: "{{ backend_vip }}"
+XQUEUE_RABBITMQ_HOSTNAME: "{{ backend_vip }}"
+
+# Memcache
+EDXAPP_MEMCACHE:
+  - "{{ groups['backend_servers'][0] }}:11211"
+  - "{{ groups['backend_servers'][1] }}:11211"
+  - "{{ groups['backend_servers'][2] }}:11211"
+
+# Elasticsearch
+EDXAPP_ELASTIC_SEARCH_CONFIG:
+    - host: "{{ backend_vip }}"
+      port: 9200
+FORUM_ELASTICSEARCH_HOST: "{{ backend_vip }}"
+EDX_NOTES_API_ELASTICSEARCH_URL: http://{{ backend_vip }}:9200
+
+# Forum
+FORUM_SINATRA_ENV: "production"
+FORUM_RACK_ENV: "production"

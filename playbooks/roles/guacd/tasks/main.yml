@@ -1,0 +1,64 @@
+---
+- name: Install requirements
+  apt:
+    name: "{{ item }}"
+    state: present
+  with_items:
+    - build-essential
+    - libcairo2-dev
+    - libjpeg-turbo8-dev
+    - libpng12-dev
+    - libossp-uuid-dev
+    - libfreerdp-dev
+    - libpango1.0-dev
+    - libssh2-1-dev
+    - libvncserver-dev
+    - libssl-dev
+    - libwebp-dev
+    - freerdp
+
+- name: Get server tarball
+  get_url:
+    url: "{{ guacd_mirror }}/guacamole/{{ guacd_version }}/source/guacamole-server-{{ guacd_version }}.tar.gz"
+    dest: /tmp
+
+- name: Extract server tarball
+  unarchive:
+    remote_src: yes
+    src: /tmp/guacamole-server-{{ guacd_version }}.tar.gz
+    dest: /tmp
+
+- name: Configure server
+  command: ./configure --with-init-dir=/etc/init.d
+  args:
+    chdir: /tmp/guacamole-server-{{ guacd_version }}
+
+- name: Compile server
+  make:
+    chdir: /tmp/guacamole-server-{{ guacd_version }}
+
+- name: Install server
+  make:
+    target: install
+    chdir: /tmp/guacamole-server-{{ guacd_version }}
+
+- name: Symlink freerdp libraries
+  file:
+    state: link
+    src: /usr/local/lib/freerdp/{{ item }}
+    dest: /usr/lib/x86_64-linux-gnu/freerdp/{{ item }}
+  with_items:
+    - guacai-client.so
+    - guacdr-client.so
+    - guacsnd-client.so
+    - guacsvc-client.so
+
+- name: Run ldconfig
+  command: ldconfig
+
+- name: Enable and start guacd
+  systemd:
+    name: guacd
+    daemon_reload: yes
+    enabled: yes
+    state: started

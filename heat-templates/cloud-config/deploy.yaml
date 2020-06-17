@@ -1,0 +1,2 @@
+#cloud-config
+merge_how: dict(recurse_array,no_replace)+list(append)

@@ -43,6 +43,7 @@
     - item.sso_id != 'None'
     - item.sso_secret is defined
     - item.sso_secret != 'None'
+  run_once: True
 
 - name: Create OAuth2 django-oauth-toolkit Backend Service Applications
   shell: >
@@ -64,3 +65,4 @@
     - item.backend_service_id != 'None'
     - item.backend_service_secret is defined
     - item.backend_service_secret != 'None'
+  run_once: True
