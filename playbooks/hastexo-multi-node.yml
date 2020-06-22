@@ -7,7 +7,7 @@
   gather_facts: True
   roles:
     - common
-    - mongo_3_2
+    - mongo_3_6
     - elasticsearch
     - { role: 'mariadb', MARIADB_CREATE_DBS: 'yes' }
     - role: postfix
