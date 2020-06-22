@@ -19,19 +19,13 @@
       - lms
     - edxlocal
     - memcache
-    - mongo_3_2
+    - mongo_3_6
     - role: rabbitmq
       rabbitmq_ip: '127.0.0.1'
     - role: edxapp
       celery_worker: True
     - edxapp
     - elasticsearch
-    - forum
-    - role: notifier
-      NOTIFIER_DIGEST_TASK_INTERVAL: "5"
-    - role: xqueue
-      update_users: True
-    - certs
     - role: postfix
       when: POSTFIX_QUEUE_EXTERNAL_SMTP_HOST is not defined or POSTFIX_QUEUE_EXTERNAL_SMTP_HOST == ''
     - role: postfix_queue
