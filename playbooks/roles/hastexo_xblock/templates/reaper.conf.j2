@@ -4,7 +4,9 @@ command=/edx/bin/python.edxapp {{ edxapp_code_dir }}/manage.py lms --settings={{
 
 user={{ common_web_user }}
 directory={{ edxapp_code_dir }}
-environment=LANG={{ EDXAPP_LANG }},DJANGO_SETTINGS_MODULE={{ EDXAPP_LMS_ENV }},SERVICE_VARIANT="lms",PATH="{{ edxapp_deploy_path }}"
+{# preserve the newline after this for loop, otherwise we end up with an environment variable named "stdout_logfile", which we don't want #}
+environment={% for name,value in edxapp_environment.items() %}{%- if value %}{{ name }}="{{ value }}"{%- endif %},{% endfor %}
+
 stdout_logfile={{ supervisor_log_dir }}/%(program_name)s-stdout.log
 stderr_logfile={{ supervisor_log_dir }}/%(program_name)s-stderr.log
 killasgroup=true
