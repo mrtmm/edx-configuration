@@ -33,6 +33,7 @@
     - supervisor
     - role: nginx
       nginx_sites:
+      - certs
       - cms
       - lms
       - xqueue
@@ -43,6 +44,7 @@
     - edxapp
     - role: xqueue
       update_users: True
+    - certs
     - role: postfix
       when: POSTFIX_QUEUE_EXTERNAL_SMTP_HOST is not defined or POSTFIX_QUEUE_EXTERNAL_SMTP_HOST == ''
     - role: postfix_queue
