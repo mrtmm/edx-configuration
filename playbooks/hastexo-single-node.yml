@@ -17,7 +17,6 @@
       - xqueue
       nginx_default_sites:
       - lms
-      - blockstore
     - edxlocal
     - memcache
     - mongo_3_6
@@ -33,4 +32,3 @@
       when: POSTFIX_QUEUE_EXTERNAL_SMTP_HOST != ''
     - guacd
     - hastexo_xblock
-    - blockstore
