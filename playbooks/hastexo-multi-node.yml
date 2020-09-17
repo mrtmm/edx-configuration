@@ -37,7 +37,6 @@
       - lms
       nginx_default_sites:
       - lms
-      - blockstore
     - role: edxapp
       celery_worker: True
     - edxapp
@@ -47,7 +46,6 @@
       when: POSTFIX_QUEUE_EXTERNAL_SMTP_HOST != ''
     - guacd
     - hastexo_xblock
-    - blockstore
 
 - name: Stop all services on app master
   hosts: app_master
