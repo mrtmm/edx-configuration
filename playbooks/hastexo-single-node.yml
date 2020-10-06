@@ -13,7 +13,6 @@
       - certs
       - lms
       - cms
-      - forum
       - xqueue
       nginx_default_sites:
       - lms
@@ -25,6 +24,9 @@
     - role: edxapp
       celery_worker: True
     - edxapp
+    - role: xqueue
+      update_users: True
+    - certs
     - elasticsearch
     - role: postfix
       when: POSTFIX_QUEUE_EXTERNAL_SMTP_HOST is not defined or POSTFIX_QUEUE_EXTERNAL_SMTP_HOST == ''
