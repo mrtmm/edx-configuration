@@ -1,6 +1,14 @@
 ---
 # Example multi-node OpenStack deployment.
 
+- name: Configure deployment node
+  hosts: localhost
+  become: True
+  gather_facts: True
+  roles:
+    - role: postfix_queue
+      when: POSTFIX_QUEUE_EXTERNAL_SMTP_HOST != ''
+
 - name: Configure backend servers
   hosts: backend_servers
   become: True
