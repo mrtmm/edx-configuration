@@ -1,0 +1,197 @@
+---
+#
+# edX Configuration
+#
+# github:     https://github.com/edx/configuration
+# wiki:       https://openedx.atlassian.net/wiki/display/OpenOPS
+# code style: https://openedx.atlassian.net/wiki/display/OpenOPS/Ansible+Code+Conventions
+# license:    https://github.com/edx/configuration/blob/master/LICENSE.TXT
+#
+#
+#
+# Tasks for role edx_django_async_service
+#
+
+- name: install python3
+  apt:
+    name: "{{ item }}"
+  with_items:
+    - python3-pip
+    - python3-dev
+  tags:
+    - install
+    - install:system-requirements
+
+- name: build virtualenv with python3
+  command: "virtualenv --python=python3 {{ edx_django_async_service_venv_dir }}"
+  args:
+    creates: "{{ edx_django_async_service_venv_dir }}/bin/pip"
+  become_user: "{{ edx_django_async_service_user }}"
+  tags:
+    - install
+    - install:system-requirements
+
+- name: Pin pip to a specific version.
+  command: "{{ edx_django_async_service_venv_dir }}/bin/pip install pip=={{ common_pip_version }}"
+  become_user: "{{ edx_django_async_service_user }}"
+  tags:
+    - install
+    - install:system-requirements
+
+- name: install nodenv
+  command: pip install nodeenv
+  become_user: "{{ edx_django_async_service_user }}"
+  environment: "{{ edx_django_async_service_environment }}"
+  tags:
+    - install
+    - install:system-requirements
+
+- name: create nodeenv
+  command: "nodeenv {{ edx_django_async_service_nodeenv_dir }} --node={{ edx_django_async_service_node_version }} --prebuilt"
+  args:
+    creates: "{{ edx_django_async_service_nodeenv_dir }}"
+  become_user: "{{ edx_django_async_service_user }}"
+  environment: "{{ edx_django_async_service_environment }}"
+  tags:
+    - install
+    - install:system-requirements
+
+- name: upgrade npm
+  command: "npm install -g npm@{{ edx_django_async_service_npm_version }}"
+  become_user: "{{ edx_django_async_service_user }}"
+  environment: "{{ edx_django_async_service_environment }}"
+  tags:
+    - install
+    - install:system-requirements
+  when: edx_django_async_service_npm_version is defined
+
+- name: install requirements
+  command: "{{ edx_django_async_service_venv_bin_dir }}/pip install -r requirements.txt"
+  args:
+    chdir: "{{ edx_django_async_service_code_dir }}"
+  become_user: "{{ edx_django_async_service_user }}"
+  environment: "{{ edx_django_async_service_environment }}"
+  tags:
+    - install
+    - install:requirements
+
+- name: install daphne
+  pip:
+    name: daphne
+    version: "{{ edx_django_async_service_daphne_version }}"
+    virtualenv: "{{ edx_django_async_service_venv_dir }}"
+
+- name: write supervisord config
+  template:
+    src: "edx/app/supervisor/conf.d.available/app.conf.j2"
+    dest: "{{ supervisor_available_dir }}/{{ edx_django_async_service_name }}.conf"
+    owner: "{{ supervisor_user }}"
+    group: "{{ common_web_user }}"
+    mode: 0644
+  tags:
+    - install
+    - install:configuration
+
+- name: ensure log files exist for tailing
+  file:
+    path: "{{ item }}"
+    state: touch
+    owner: "{{ common_web_user }}"
+    group: "{{ common_web_user }}"
+  with_items: '{{ edx_django_async_service_logs }}'
+  tags:
+    - install
+    - install:configuration
+
+- name: create daphne run directory
+  file:
+    path: /edx/var/supervisor/run/daphne
+    state: directory
+    owner: "{{ common_web_user }}"
+    group: "{{ common_web_user }}"
+    mode: 0755
+
+- name: setup the app env file
+  template:
+    src: "edx/app/app/app_env.j2"
+    dest: "{{ edx_django_async_service_home }}/{{ edx_django_async_service_name }}_env"
+    owner: "{{ edx_django_async_service_user }}"
+    group: "{{ edx_django_async_service_user }}"
+    mode: 0644
+  tags:
+    - install
+    - install:configuration
+
+- name: enable supervisor script
+  file:
+    src: "{{ supervisor_available_dir }}/{{ edx_django_async_service_name }}.conf"
+    dest: "{{ supervisor_cfg_dir }}/{{ edx_django_async_service_name }}.conf"
+    state: link
+    force: yes
+  when: not disable_edx_services
+  tags:
+    - install
+    - install:configuration
+
+- name: update supervisor configuration
+  command: "{{ supervisor_ctl }} -c {{ supervisor_cfg }} update"
+  when: not disable_edx_services
+  tags:
+    - manage
+    - manage:start
+
+- name: create symlinks from the venv bin dir
+  file:
+    src: "{{ edx_django_async_service_venv_dir }}/bin/{{ item }}"
+    dest: "{{ COMMON_BIN_DIR }}/{{ item.split('.')[0] }}.{{ edx_django_async_service_name }}"
+    state: link
+  with_items:
+    - python
+    - pip
+  tags:
+    - install
+    - install:app-requirements
+
+- name: compile static assets
+  command: "{{ edx_django_async_service_docker_run_command_make_static }} make static"
+  args:
+    chdir: "{{ edx_django_async_service_code_dir }}"
+  become_user: "{{ edx_django_async_service_user }}"
+  environment: "{{ edx_django_async_service_environment }}"
+  when: edx_django_async_service_has_static_assets
+  tags:
+    - assets
+    - assets:gather
+
+- name: restart the application
+  supervisorctl:
+    state: restarted
+    supervisorctl_path: "{{ supervisor_ctl }}"
+    config: "{{ supervisor_cfg }}"
+    name: "{{ edx_django_async_service_name }}:"
+  when: not disable_edx_services
+  become_user: "{{ supervisor_service_user }}"
+  tags:
+    - manage
+    - manage:start
+
+- name: Nginx include
+  template:
+    src: "edx/app/nginx/include/lms/app.j2"
+    dest: "{{ COMMON_APP_DIR }}/nginx/include/lms/{{ edx_django_async_service_name }}"
+    owner: root
+    group: "{{ common_web_group }}"
+  notify:
+    - restart nginx
+  when: edx_django_async_service_lms_include_url is defined
+
+- name: Include JWT signature setting in the app config file
+  include_role:
+    name: jwt_signature
+  when: CONFIGURE_JWTS
+  vars:
+     app_name: '{{ edx_django_async_service_name }}'
+     app_config_file: "{{ edx_django_async_service_app_config_file }}"
+     app_config_owner: root
+     app_config_group: root
+     app_config_mode: 0644
