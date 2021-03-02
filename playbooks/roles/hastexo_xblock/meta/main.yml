@@ -2,6 +2,8 @@
 dependencies:
   - common_vars
   - supervisor
+  - role: hastexo_guacamole_client
+    when: hastexo_xblock_version is version('5', '>=')
   - role: git_clone
     repo_owner: "{{ hastexo_xblock_git_user }}"
     repo_group: "{{ hastexo_xblock_git_group }}"
