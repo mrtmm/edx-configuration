@@ -1,0 +1,49 @@
+---
+hastexo_guacamole_service: 'hastexo_guacamole_client'
+hastexo_guacamole_repo: 'hastexo-xblock'
+hastexo_guacamole_home: '{{ COMMON_APP_DIR }}/{{ hastexo_guacamole_service }}'
+hastexo_guacamole_user: '{{ hastexo_guacamole_service }}'
+hastexo_guacamole_url: '/hastexo-xblock/'
+hastexo_guacamole_port: 8080
+
+hastexo_guacamole_asgi_application: 'hastexo_guacamole_client.routing:application'
+hastexo_guacamole_settings_module: 'hastexo_guacamole_client.settings'
+hastexo_guacamole_xblock_settings: {}
+
+hastexo_guacamole_git_protocol: "https"
+hastexo_guacamole_git_mirror: "{{ COMMON_GIT_MIRROR }}"
+
+hastexo_guacamole_git_path: 'hastexo'
+# This role can only be used with the hastexo-xblock version 5.0.0 and higher
+hastexo_guacamole_version: 'master'
+hastexo_guacamole_git_tag: "v{{ hastexo_guacamole_version }}"
+hastexo_guacamole_code_dir: '{{ hastexo_guacamole_home }}/{{ hastexo_guacamole_repo }}'
+hastexo_guacamole_git_identity: !!null
+
+HASTEXO_GUACAMOLE_SECRET_KEY: !!null
+HASTEXO_GUACAMOLE_ALLOWED_HOSTS: ''
+HASTEXO_GUACAMOLE_DEBUG: false
+HASTEXO_GUACAMOLE_LOG_LEVEL: 'warning'
+
+# hastexo_guacamole_client should use the 'edxapp' database
+# as it needs to access the stacks created in the 'hastexo-xblock'
+HASTEXO_GUACAMOLE_DEFAULT_DB_NAME: 'edxapp'
+HASTEXO_GUACAMOLE_DATABASE_USER: 'edxapp001'
+HASTEXO_GUACAMOLE_DATABASE_PASSWORD: 'password'
+HASTEXO_GUACAMOLE_DATABASE_HOST: 'localhost'
+HASTEXO_GUACAMOLE_DATABASE_PORT: 3306
+HASTEXO_GUACAMOLE_DATABASE_ATOMIC_REQUESTS: true
+HASTEXO_GUACAMOLE_DATABASE_OPTIONS: {}
+
+hastexo_guacamole_environment_extra:
+  HASTEXO_GUACAMOLE_CFG: '{{ COMMON_CFG_DIR }}/{{ hastexo_guacamole_service }}.yml'
+
+hastexo_guacamole_debian_pkgs:
+  - libmysqlclient-dev
+  - libjpeg-dev
+  - libssl-dev
+  - libffi-dev
+
+hastexo_guacamole_decrypt_config_enabled: "{{ COMMON_DECRYPT_CONFIG_ENABLED }}"
+hastexo_guacamole_copy_config_enabled: "{{ COMMON_COPY_CONFIG_ENABLED }}"
+hastexo_guacamole_has_static_assets: false

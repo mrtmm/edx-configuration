@@ -1,0 +1,23 @@
+---
+dependencies:
+  - common
+  - role: supervisor
+    supervisor_spec:
+      - service: "{{ edx_django_async_service_name }}"
+        migration_check_services: "{{ edx_django_async_service_migration_check_services }}"
+        python: "python.{{ edx_django_async_service_name }}"
+        code: "{{ edx_django_async_service_code_dir }}"
+        env: "{{ edx_django_async_service_home }}/{{ edx_django_async_service_name }}_env"
+  - role: automated
+    AUTOMATED_USERS: "{{ edx_django_async_service_automated_users }}"
+  - role: edx_service
+    edx_service_name: "{{ edx_django_async_service_name }}"
+    edx_service_config: "{{ edx_django_async_service_config }}"
+    edx_service_repos: "{{ edx_django_async_service_repos }}"
+    edx_service_user: "{{ edx_django_async_service_user }}"
+    edx_service_home: "{{ edx_django_async_service_home }}"
+    edx_service_packages:
+      debian: "{{ edx_django_async_service_debian_pkgs }}"
+      redhat: []
+    edx_service_decrypt_config_enabled: "{{ edx_django_async_service_decrypt_config_enabled }}"
+    edx_service_copy_config_enabled: "{{ edx_django_async_service_copy_config_enabled }}"

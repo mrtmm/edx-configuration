@@ -1,0 +1,21 @@
+#
+# {{ ansible_managed }}
+#
+
+[fcgi-program:{{ edx_django_async_service_name }}]
+
+socket=tcp://{{ edx_django_async_service_daphne_host }}:{{ edx_django_async_service_daphne_port }}
+directory={{ edx_django_async_service_code_dir }}
+command={{ edx_django_async_service_venv_bin_dir }}/daphne -u /edx/var/supervisor/run/daphne/daphne%(process_num)d.sock --fd 0 --access-log - --proxy-headers {{ edx_django_async_service_asgi_application }}
+numprocs={{ ansible_processor_count }}
+process_name={{ edx_django_async_service_name }}%(process_num)d
+autostart=true
+autorestart=true
+stdout_logfile={{ supervisor_log_dir }}/%(program_name)s-stdout.log
+stderr_logfile={{ supervisor_log_dir }}/%(program_name)s-stderr.log
+environment =
+    {% for key, value in edx_django_async_service_environment.items() -%}
+    {%- if value -%}
+    {{ key }}="{{ value }}"{{ ", " if not loop.last else "" }}
+    {% endif %}
+    {%- endfor %}
