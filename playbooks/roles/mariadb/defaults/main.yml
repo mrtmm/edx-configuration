@@ -14,7 +14,7 @@ MARIADB_APT_KEY_XENIAL_ID: '0xF1656F24C74CD1D8'
 MARIADB_APT_KEY_ID: '0xcbcb082a1bb943db'
 
 # Note: version is determined by repo
-MARIADB_REPO: "deb http://mirrors.syringanetworks.net/mariadb/repo/10.1/ubuntu {{ ansible_distribution_release }} main"
+MARIADB_REPO: "deb [arch=amd64,arm64,i386,ppc64el] http://mirror.23media.de/mariadb/repo/10.4/ubuntu {{ ansible_distribution_release }} main"
 
 MARIADB_CREATE_DBS: yes
 MARIADB_CLUSTERED: no
