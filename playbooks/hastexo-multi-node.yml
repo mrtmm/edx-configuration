@@ -18,8 +18,6 @@
     - mongo_3_6
     - elasticsearch
     - { role: 'mariadb', MARIADB_CREATE_DBS: 'yes' }
-    - role: postfix
-      when: POSTFIX_QUEUE_EXTERNAL_SMTP_HOST is not defined or POSTFIX_QUEUE_EXTERNAL_SMTP_HOST == ''
     - role: postfix_queue
       when: POSTFIX_QUEUE_EXTERNAL_SMTP_HOST != ''
     - memcache
@@ -55,8 +53,6 @@
     - certs
     - role: user_retirement_pipeline
       when: COMMON_RETIREMENT_SERVICE_SETUP
-    - role: postfix
-      when: POSTFIX_QUEUE_EXTERNAL_SMTP_HOST is not defined or POSTFIX_QUEUE_EXTERNAL_SMTP_HOST == ''
     - role: postfix_queue
       when: POSTFIX_QUEUE_EXTERNAL_SMTP_HOST != ''
     - guacd
