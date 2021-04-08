@@ -19,8 +19,7 @@
     - edxlocal
     - memcache
     - mongo_3_6
-    - role: rabbitmq
-      rabbitmq_ip: '127.0.0.1'
+    - role: redis
     - role: edxapp
       celery_worker: True
     - edxapp
