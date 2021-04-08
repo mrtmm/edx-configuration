@@ -23,13 +23,13 @@
     - memcache
 
 # RabbitMQ needs to be built serially
-- name: Configure RabbitMQ
+- name: Configure Redis
   hosts: backend_servers
   become: True
   gather_facts: True
   serial: 1
   roles:
-    - rabbitmq
+    - redis
 
 - name: Configure app servers
   hosts: app_servers:tmp_app_servers:app_master
