@@ -1,21 +1,19 @@
 ---
 - name: Install requirements
   apt:
-    name: "{{ item }}"
-    state: present
-  with_items:
-    - build-essential
-    - libcairo2-dev
-    - libjpeg-turbo8-dev
-    - libpng12-dev
-    - libossp-uuid-dev
-    - libfreerdp-dev
-    - libpango1.0-dev
-    - libssh2-1-dev
-    - libvncserver-dev
-    - libssl-dev
-    - libwebp-dev
-    - freerdp
+    name:
+      - build-essential
+      - libcairo2-dev
+      - libjpeg-turbo8-dev
+      - libpng-dev
+      - libtool-bin
+      - libossp-uuid-dev
+      - libpango1.0-dev
+      - libssh2-1-dev
+      - libvncserver-dev
+      - libssl-dev
+      - libwebp-dev
+      - freerdp2-dev
 
 - name: Get server tarball
   get_url:
