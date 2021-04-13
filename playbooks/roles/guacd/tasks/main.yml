@@ -40,17 +40,6 @@
     target: install
     chdir: /tmp/guacamole-server-{{ guacd_version }}
 
-- name: Symlink freerdp libraries
-  file:
-    state: link
-    src: /usr/local/lib/freerdp/{{ item }}
-    dest: /usr/lib/x86_64-linux-gnu/freerdp/{{ item }}
-  with_items:
-    - guacai-client.so
-    - guacdr-client.so
-    - guacsnd-client.so
-    - guacsvc-client.so
-
 - name: Run ldconfig
   command: ldconfig
 
