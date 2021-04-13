@@ -32,7 +32,7 @@
     - install:system-requirements
 
 - name: Pin pip to a specific version.
-  command: "{{ edx_django_async_service_venv_dir }}/bin/pip install pip=={{ common_pip_version }}"
+  command: "{{ edx_django_async_service_venv_dir }}/bin/pip install pip=={{ COMMON_PIP_VERSION }}"
   become_user: "{{ edx_django_async_service_user }}"
   tags:
     - install
