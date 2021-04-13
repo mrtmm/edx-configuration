@@ -1,6 +1,6 @@
 [program:reaper]
 
-command=/edx/bin/python.edxapp {{ edxapp_code_dir }}/manage.py lms --settings={{ EDXAPP_SETTINGS }} reaper
+command={{ edxapp_venv_bin }}/python {{ edxapp_code_dir }}/manage.py lms --settings={{ EDXAPP_SETTINGS }} reaper
 
 user={{ common_web_user }}
 directory={{ edxapp_code_dir }}
